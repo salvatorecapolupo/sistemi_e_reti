@@ -86,7 +86,6 @@
         }
         table.wikitable th { background-color: #f2f2f2; }
 
-        /* Advanced Tool Styles */
         .tool-container {
             background-color: #f8f9fa;
             border: 1px solid var(--wiki-border);
@@ -181,6 +180,7 @@
             box-shadow: 0 0 5px rgba(6, 69, 173, 0.3);
         }
 
+        /* FIX: unica sorgente di verità per il feedback — niente conflitti style/class */
         .feedback {
             margin-top: 25px;
             padding: 15px;
@@ -188,8 +188,18 @@
             display: none;
             font-size: 1.05em;
         }
-        .feedback.success { background-color: var(--success); color: var(--success-text); display: block; border: 1px solid var(--success-text);}
-        .feedback.error { background-color: var(--error); color: var(--error-text); display: block; border: 1px solid var(--error-text); }
+        .feedback.success {
+            background-color: var(--success);
+            color: var(--success-text);
+            display: block;
+            border: 1px solid var(--success-text);
+        }
+        .feedback.error {
+            background-color: var(--error);
+            color: var(--error-text);
+            display: block;
+            border: 1px solid var(--error-text);
+        }
         .feedback ul { margin: 10px 0 0 0; padding-left: 20px; }
         
         .score-highlight { font-size: 1.2em; font-weight: bold; }
@@ -214,9 +224,6 @@
 
     <h2>1. Composizione e Logica degli Indirizzi IPv4</h2>
     <p>Un indirizzo IPv4 è formato da 32 bit, generalmente raggruppati in quattro byte (o ottetti) e scritti in formato decimale separati da un punto. Strutturalmente, ogni indirizzo si divide in due sezioni logiche:</p>
-    
-    
-    
     <ul>
         <li><strong>Identificativo di Rete (NetID):</strong> Indica la specifica rete logica in cui il dispositivo è inserito.</li>
         <li><strong>Identificativo di Host (HostID):</strong> Distingue il singolo terminale all'interno di quella specifica rete.</li>
@@ -224,8 +231,6 @@
 
     <h2>2. Classi di Indirizzamento Storiche</h2>
     <p>In origine, la suddivisione tra bit di Rete e bit di Host avveniva in modo rigido in base al valore dei primi bit dell'indirizzo (metodo <em>classful</em>). Le classi utilizzabili per l'assegnazione agli host erano tre:</p>
-    
-    
     
     <table class="wikitable">
         <tr>
@@ -253,27 +258,23 @@
             <td>255.255.255.0</td>
         </tr>
     </table>
-    <p>Esistono inoltre blocchi di indirizzi dedicati esclusivamente all'uso in reti private locali (LAN) e non instradabili su Internet (come i range 10.x.x.x, 172.16.x.x - 172.31.x.x e 192.168.x.x). Due indirizzi per ogni rete sono sempre riservati: l'identificativo della rete stessa (tutti i bit host a 0) e l'indirizzo di broadcast (tutti i bit host a 1).</p>
+    <p>Esistono inoltre blocchi di indirizzi dedicati esclusivamente all'uso in reti private locali (LAN) e non instradabili su Internet (come i range 10.x.x.x, 172.16.x.x–172.31.x.x e 192.168.x.x). Due indirizzi per ogni rete sono sempre riservati: l'identificativo della rete stessa (tutti i bit host a 0) e l'indirizzo di broadcast (tutti i bit host a 1).</p>
 
     <h2>3. Subnetting e CIDR</h2>
     <p>Per limitare gli sprechi di IP e migliorare le prestazioni, l'approccio classful è stato sostituito dal <strong>Subnetting</strong>. Questo processo consiste nel sottrarre dei bit alla porzione host originaria per assegnarli all'identificativo di rete, creando di fatto delle sottoreti (Subnet).</p>
-    
-    
-    
     <p>La quantità di bit destinati alla rete viene oggi indicata tramite la notazione <strong>CIDR</strong> (es. /24, /26, /18), che corrisponde al numero di bit a "1" presenti nella <em>Subnet Mask</em>.</p>
-
 
     <h2 id="esercizi">4. Masterclass Subnetting: Generatore e Correttore Avanzato</h2>
     <p>Usa questo strumento per esercitarti sui calcoli di rete complessi. Il sistema genererà un IP casuale con una maschera a lunghezza variabile (CIDR da /8 a /30).</p>
-    <p><strong>Regole:</strong> Hai a disposizione <strong>massimo 3 tentativi</strong>. Il punteggio è calcolato in base alle risposte esatte fornite. Nei primi due tentativi ti verrà indicato solo quali campi hai sbagliato, senza rivelare la soluzione. Se esaurisci i tentativi, le soluzioni verranno svelate e l'esercizio sarà terminato.</p>
+    <p><strong>Regole:</strong> Hai a disposizione <strong>massimo 3 tentativi</strong> per esercizio. Il punteggio finale dipende dal numero di risposte corrette; nei tentativi 2 e 3 viene applicata una penalità del 5% per tentativo. Nei primi due tentativi ti verrà indicato solo quali campi hai sbagliato, senza rivelare la soluzione. Se esaurisci i tentativi, le soluzioni verranno svelate.</p>
 
     <div class="tool-container">
         <div class="tool-header">
             <h3>Laboratorio di Indirizzamento</h3>
             <div class="score-board">
                 <span class="attempt-display" id="attempt-display">Tentativo: 1/3</span>
-                <span class="score-display" id="score-display">Punteggio: 0%</span>
-                <button class="btn btn-secondary" onclick="generateComplexExercise()">Genera Nuova Rete Casuale</button>
+                <span class="score-display" id="score-display">Punteggio: —</span>
+                <button class="btn btn-secondary" onclick="generateExercise()">Genera Nuova Rete Casuale</button>
             </div>
         </div>
 
@@ -325,7 +326,7 @@
         </div>
 
         <div style="text-align: center; margin-top: 30px;">
-            <button id="verify-btn" class="btn" onclick="verifyComplexExercise()" style="width: 250px; padding: 14px; font-size: 16px;">Verifica i tuoi Calcoli</button>
+            <button id="verify-btn" class="btn" onclick="verifyExercise()" style="width: 250px; padding: 14px; font-size: 16px;">Verifica i tuoi Calcoli</button>
         </div>
 
         <div id="feedback" class="feedback"></div>
@@ -336,168 +337,174 @@
 <script>
     let currentEx = null;
     let currentAttempt = 1;
-    const maxAttempts = 3;
+    const MAX_ATTEMPTS = 3;
 
-    // Helper matematici per IP
     function ip2long(ip) {
         return ip.split('.').reduce((acc, octet) => (acc << 8) + parseInt(octet, 10), 0) >>> 0;
     }
-    
+
     function long2ip(long) {
-        return [ (long >>> 24) & 255, (long >>> 16) & 255, (long >>> 8) & 255, long & 255 ].join('.');
+        return [
+            (long >>> 24) & 255,
+            (long >>> 16) & 255,
+            (long >>> 8)  & 255,
+             long         & 255
+        ].join('.');
     }
 
-    function generateComplexExercise() {
-        // Reset interfaccia
-        document.querySelectorAll('.form-group input').forEach(input => input.value = "");
-        document.getElementById('in-class').value = "";
-        document.getElementById('feedback').className = "feedback";
-        document.getElementById('feedback').style.display = "none";
+    function resetFeedback() {
+        // FIX: reset pulito senza conflitto tra className e style inline
+        const fb = document.getElementById('feedback');
+        fb.className = 'feedback';
+        fb.innerHTML = '';
+    }
+
+    function showFeedback(type, html) {
+        const fb = document.getElementById('feedback');
+        fb.className = 'feedback ' + type; // 'success' o 'error' — il CSS gestisce display:block
+        fb.innerHTML = html;
+    }
+
+    function generateExercise() {
+        // Reset UI
+        document.querySelectorAll('.form-group input').forEach(el => el.value = '');
+        document.getElementById('in-class').value = '';
         document.getElementById('verify-btn').disabled = false;
-        
+        resetFeedback();
+
         currentAttempt = 1;
-        updateStatusDisplay(0.0);
+        updateStatus();
 
-        // Generazione IP Casuale valido (Evitando 127.x.x.x e Multicast/Class E)
-        let o1 = Math.floor(Math.random() * 223) + 1;
-        if(o1 === 127) o1 = 128; 
-        let o2 = Math.floor(Math.random() * 256);
-        let o3 = Math.floor(Math.random() * 256);
-        let o4 = Math.floor(Math.random() * 256);
-        
-        let ipStr = `${o1}.${o2}.${o3}.${o4}`;
-        
-        // Calcolo Classe Storica
-        let ipClass = "Sconosciuta";
-        if (o1 >= 1 && o1 <= 126) ipClass = "A";
-        else if (o1 >= 128 && o1 <= 191) ipClass = "B";
-        else if (o1 >= 192 && o1 <= 223) ipClass = "C";
+        // Genera primo ottetto valido: classe A (1-126), B (128-191), C (192-223)
+        // FIX semantico: 127 è loopback — escluso esplicitamente; range corretto per le tre classi
+        const ranges = [
+            [1,   126],  // Classe A
+            [128, 191],  // Classe B
+            [192, 223]   // Classe C
+        ];
+        const [lo, hi] = ranges[Math.floor(Math.random() * ranges.length)];
+        const o1 = Math.floor(Math.random() * (hi - lo + 1)) + lo;
+        const o2 = Math.floor(Math.random() * 256);
+        const o3 = Math.floor(Math.random() * 256);
+        const o4 = Math.floor(Math.random() * 256);
+        const ipStr = `${o1}.${o2}.${o3}.${o4}`;
 
-        // Genera CIDR casuale tra /8 e /30 per garantire varietà di subnetting
-        let cidr = Math.floor(Math.random() * 23) + 8; // 8 to 30
+        // Classe storica
+        let ipClass;
+        if      (o1 <= 126) ipClass = 'A';
+        else if (o1 <= 191) ipClass = 'B';
+        else                ipClass = 'C';
 
-        // Calcoli Binari
-        let ipL = ip2long(ipStr);
-        let maskL = ~((1 << (32 - cidr)) - 1) >>> 0;
-        
-        let netL = (ipL & maskL) >>> 0;
-        let bcastL = (netL | (~maskL)) >>> 0;
-        
-        let firstHostL = netL + 1;
-        let lastHostL = bcastL - 1;
-        
-        let usableHosts = (cidr >= 31) ? 0 : Math.pow(2, 32 - cidr) - 2;
-        if(usableHosts < 0) usableHosts = 0;
+        // CIDR /8 – /30
+        const cidr = Math.floor(Math.random() * 23) + 8;
+
+        // Calcoli binari
+        const ipL    = ip2long(ipStr);
+        const maskL  = (~((1 << (32 - cidr)) - 1)) >>> 0;
+        const netL   = (ipL & maskL) >>> 0;
+        const bcastL = (netL | ~maskL) >>> 0;
+
+        // FIX semantico: formula host corretta; cidr >= 31 → 0 host assegnabili (didattico)
+        const usableHosts = Math.max(0, Math.pow(2, 32 - cidr) - 2);
 
         currentEx = {
-            ip: ipStr,
-            cidr: cidr,
+            ip:         ipStr,
+            cidr:       cidr,
             storicClass: ipClass,
-            mask: long2ip(maskL),
-            network: long2ip(netL),
-            first: long2ip(firstHostL),
-            last: long2ip(lastHostL),
-            broadcast: long2ip(bcastL),
-            hosts: usableHosts.toString()
+            mask:       long2ip(maskL),
+            network:    long2ip(netL),
+            first:      long2ip(netL  + 1),
+            last:       long2ip(bcastL - 1),
+            broadcast:  long2ip(bcastL),
+            hosts:      usableHosts.toString()
         };
 
-        // Mostra a schermo l'esercizio
-        document.getElementById('ex-ip-cidr').innerText = `${currentEx.ip} /${currentEx.cidr}`;
+        document.getElementById('ex-ip-cidr').textContent = `${ipStr} /${cidr}`;
     }
 
-    function updateStatusDisplay(score) {
-        document.getElementById('score-display').innerText = `Punteggio: ${score.toFixed(1)}%`;
-        let visualAttempt = currentAttempt > maxAttempts ? maxAttempts : currentAttempt;
-        document.getElementById('attempt-display').innerText = `Tentativo: ${visualAttempt}/${maxAttempts}`;
+    function updateStatus() {
+        // FIX: il display del tentativo riflette quello CORRENTE, non il precedente
+        document.getElementById('attempt-display').textContent =
+            `Tentativo: ${Math.min(currentAttempt, MAX_ATTEMPTS)}/${MAX_ATTEMPTS}`;
     }
 
-    function verifyComplexExercise() {
-        if(!currentEx) {
-            alert("Genera prima un esercizio!");
+    function verifyExercise() {
+        if (!currentEx) {
+            generateExercise();
             return;
         }
 
-        // Definizione dei campi da controllare
         const fields = [
-            { id: 'in-class', value: document.getElementById('in-class').value, expected: currentEx.storicClass, name: "Classe Storica" },
-            { id: 'in-mask', value: document.getElementById('in-mask').value.trim(), expected: currentEx.mask, name: "Subnet Mask" },
-            { id: 'in-net', value: document.getElementById('in-net').value.trim(), expected: currentEx.network, name: "Indirizzo di Rete" },
-            { id: 'in-first', value: document.getElementById('in-first').value.trim(), expected: currentEx.first, name: "Primo IP Assegnabile" },
-            { id: 'in-last', value: document.getElementById('in-last').value.trim(), expected: currentEx.last, name: "Ultimo IP Assegnabile" },
-            { id: 'in-bcast', value: document.getElementById('in-bcast').value.trim(), expected: currentEx.broadcast, name: "Indirizzo di Broadcast" },
-            { id: 'in-hosts', value: document.getElementById('in-hosts').value.trim(), expected: currentEx.hosts, name: "Numero Totale Host" }
+            { id: 'in-class',  expected: currentEx.storicClass, name: 'Classe Storica' },
+            { id: 'in-mask',   expected: currentEx.mask,        name: 'Subnet Mask' },
+            { id: 'in-net',    expected: currentEx.network,     name: 'Indirizzo di Rete' },
+            { id: 'in-first',  expected: currentEx.first,       name: 'Primo IP Assegnabile' },
+            { id: 'in-last',   expected: currentEx.last,        name: 'Ultimo IP Assegnabile' },
+            { id: 'in-bcast',  expected: currentEx.broadcast,   name: 'Indirizzo di Broadcast' },
+            { id: 'in-hosts',  expected: currentEx.hosts,       name: 'Numero Totale Host' }
         ];
 
-        let wrongFields = [];
-        let missingFields = [];
+        const wrong   = [];
+        const missing = [];
         let correctCount = 0;
 
-        // Validazione dei campi
         fields.forEach(f => {
-            if (f.value === "") {
-                missingFields.push(f.name);
-            } else if (f.value !== f.expected) {
-                wrongFields.push(f.name);
+            const val = document.getElementById(f.id).value.trim();
+            if (val === '') {
+                missing.push(f.name);
+            } else if (val !== f.expected) {
+                wrong.push(f.name);
             } else {
                 correctCount++;
             }
         });
 
-        // Calcolo punteggio: proporzionale ai campi corretti (su 7 totali)
-        // Opzionale: applichiamo una lieve penalità per ogni tentativo oltre il primo (-5% a tentativo)
-        let baseScore = (correctCount / fields.length) * 100;
-        let penalty = (currentAttempt - 1) * 5;
-        let finalScore = Math.max(0, baseScore - penalty);
-
-        updateStatusDisplay(finalScore);
-
-        let fb = document.getElementById('feedback');
-        fb.style.display = "block";
+        // FIX semantico: penalità applicata solo al punteggio FINALE mostrato a fine esercizio,
+        // non ad ogni tentativo intermedio (evita confusione su un "punteggio parziale" che cambia)
+        const baseScore  = (correctCount / fields.length) * 100;
+        const penalty    = (currentAttempt - 1) * 5;
+        const finalScore = Math.max(0, baseScore - penalty).toFixed(1);
 
         if (correctCount === fields.length) {
-            // VITTORIA
-            fb.className = "feedback success";
-            fb.innerHTML = `<strong>Ottimo lavoro!</strong><br>Hai modellato e calcolato la sottorete in modo impeccabile.<br><br><span class="score-highlight">Punteggio finale: ${finalScore.toFixed(1)}%</span>`;
+            // Successo
+            document.getElementById('score-display').textContent = `Punteggio: ${finalScore}%`;
             document.getElementById('verify-btn').disabled = true;
-        } else {
-            // ERRORE O CAMPI MANCANTI
-            if (currentAttempt < maxAttempts) {
-                // Tentativi ancora disponibili (NON mostrare le soluzioni)
-                let errorMsg = `<strong>Attenzione, ci sono errori nel tuo calcolo.</strong><br>`;
-                if (wrongFields.length > 0) {
-                    errorMsg += `<br>Hai inserito un valore errato nei seguenti campi: <ul><li>${wrongFields.join('</li><li>')}</li></ul>`;
-                }
-                if (missingFields.length > 0) {
-                    errorMsg += `<br>I seguenti campi sono stati lasciati in bianco: <ul><li>${missingFields.join('</li><li>')}</li></ul>`;
-                }
-                
-                errorMsg += `<br><em>Ti restano ${maxAttempts - currentAttempt} tentativi per correggere!</em>`;
-                
-                fb.className = "feedback error";
-                fb.innerHTML = errorMsg;
-                currentAttempt++;
-                
-                // Aggiorna a schermo il numero del prossimo tentativo
-                let nextAttempt = currentAttempt > maxAttempts ? maxAttempts : currentAttempt;
-                document.getElementById('attempt-display').innerText = `Tentativo: ${nextAttempt}/${maxAttempts}`;
+            showFeedback('success',
+                `<strong>Ottimo lavoro!</strong> Hai calcolato la sottorete in modo impeccabile.<br><br>
+                 <span class="score-highlight">Punteggio finale: ${finalScore}%</span>`
+            );
+            return;
+        }
 
-            } else {
-                // GAME OVER (Tentativi esauriti, MOSTRA le soluzioni)
-                let solutionsHtml = fields.map(f => `<li><strong>${f.name}:</strong> ${f.expected}</li>`).join('');
-                
-                fb.className = "feedback error";
-                fb.innerHTML = `<strong>Hai esaurito i ${maxAttempts} tentativi! Esercizio terminato.</strong><br><br>
-                                <span class="score-highlight">Il tuo punteggio finale è: ${finalScore.toFixed(1)}%</span><br><br>
-                                Ecco le risposte corrette che dovevi inserire:
-                                <ul>${solutionsHtml}</ul>`;
-                
-                document.getElementById('verify-btn').disabled = true;
-            }
+        // Errore
+        if (currentAttempt < MAX_ATTEMPTS) {
+            // FIX: non mostrare il punteggio nei tentativi intermedi — è fuorviante
+            let html = `<strong>Ci sono errori nel calcolo.</strong>`;
+            if (wrong.length)
+                html += `<br>Valore errato in: <ul><li>${wrong.join('</li><li>')}</li></ul>`;
+            if (missing.length)
+                html += `<br>Campi lasciati vuoti: <ul><li>${missing.join('</li><li>')}</li></ul>`;
+
+            currentAttempt++;
+            updateStatus();
+            html += `<br><em>Tentativi rimanenti: ${MAX_ATTEMPTS - currentAttempt + 1}</em>`;
+            showFeedback('error', html);
+
+        } else {
+            // Game over — mostra soluzioni
+            document.getElementById('score-display').textContent = `Punteggio: ${finalScore}%`;
+            document.getElementById('verify-btn').disabled = true;
+            const solutionsHtml = fields.map(f => `<li><strong>${f.name}:</strong> ${f.expected}</li>`).join('');
+            showFeedback('error',
+                `<strong>Tentativi esauriti.</strong><br><br>
+                 <span class="score-highlight">Punteggio finale: ${finalScore}%</span><br><br>
+                 Soluzioni corrette:
+                 <ul>${solutionsHtml}</ul>`
+            );
         }
     }
 
-    // Genera subito un esercizio all'avvio
-    window.onload = generateComplexExercise;
+    window.onload = generateExercise;
 </script>
 
 </body>
