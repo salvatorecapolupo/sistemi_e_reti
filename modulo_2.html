@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modulo 2: Livello Fisico - Sistemi e Reti</title>
+    <style>
+        :root {
+            --wiki-bg: #f6f6f6;
+            --wiki-border: #a2a9b1;
+            --wiki-blue: #0645ad;
+            --wiki-blue-hover: #0b0080;
+            --layer-phys: #e5d8bd;
+        }
+
+        body {
+            font-family: sans-serif;
+            background-color: var(--wiki-bg);
+            color: #202122;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            background: white;
+            padding: 30px;
+            border: 1px solid var(--wiki-border);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* Header e Navigazione */
+        .top-nav {
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            background: #f8f9fa;
+            padding: 10px 15px;
+            border: 1px solid var(--wiki-border);
+            border-radius: 4px;
+        }
+
+        h1, h2, h3 {
+            font-family: "Linux Libertine", "Georgia", "Times", serif;
+            border-bottom: 1px solid var(--wiki-border);
+            padding-bottom: 5px;
+            font-weight: normal;
+        }
+
+        h1 { font-size: 2em; margin-top: 0; }
+        
+        a { color: var(--wiki-blue); text-decoration: none; }
+        a:hover { text-decoration: underline; color: var(--wiki-blue-hover); }
+
+        .layer-badge {
+            background-color: var(--layer-phys);
+            padding: 5px 10px;
+            border: 1px solid #888;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        /* TOC */
+        .toc {
+            background: #f8f9fa;
+            border: 1px solid var(--wiki-border);
+            padding: 15px;
+            display: inline-block;
+            margin: 20px 0;
+            font-size: 0.95em;
+        }
+        .toc ul { list-style: none; padding-left: 20px; }
+        .toc > ul { padding-left: 0; }
+
+        table.wikitable {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table.wikitable th, table.wikitable td {
+            border: 1px solid var(--wiki-border);
+            padding: 8px;
+            text-align: left;
+        }
+        table.wikitable th { background-color: #f2f2f2; }
+
+        /* Interactive Tabs */
+        .tab-container {
+            margin: 30px 0;
+            border: 1px solid var(--wiki-border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .tab-buttons {
+            display: flex;
+            background-color: #f1f1f1;
+            border-bottom: 1px solid var(--wiki-border);
+        }
+
+        .tab-button {
+            background-color: inherit;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 20px;
+            transition: 0.3s;
+            font-size: 16px;
+            font-weight: bold;
+            flex: 1;
+        }
+
+        .tab-button:hover {
+            background-color: #ddd;
+        }
+
+        .tab-button.active {
+            background-color: white;
+            border-bottom: 3px solid var(--wiki-blue);
+            color: var(--wiki-blue);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background-color: white;
+            animation: fadeEffect 0.5s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeEffect {
+            from {opacity: 0;}
+            to {opacity: 1;}
+        }
+
+        .info-box {
+            background-color: #eaf3ff;
+            border-left: 5px solid var(--wiki-blue);
+            padding: 15px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="top-nav">
+        <a href="index.html">← Torna all'Indice del Corso</a> | 
+        <a href="modulo_1.html">Modulo 1: Modelli di Rete</a> &gt; <strong>Modulo 2: Livello Fisico</strong>
+    </div>
+
+    <div class="layer-badge">Livello 1 OSI / Accesso di Rete TCP/IP</div>
+    <h1>Modulo 2: Il Livello Fisico e i Mezzi Trasmissivi</h1>
+    
+    <p>Il <strong>Livello Fisico (Physical Layer)</strong> è il primo livello del modello OSI. Il suo scopo esclusivo è trasmettere una sequenza grezza di <strong>bit</strong> (0 e 1) da un nodo all'altro attraverso un mezzo trasmissivo. Non si preoccupa del significato dei dati, ma solo di come codificarli in segnali (elettrici, luminosi o radio) compatibili con il mezzo fisico.</p>
+
+    <div class="toc">
+        <b>Indice</b>
+        <ul>
+            <li><a href="#segnali">1. Segnali e Disturbi</a></li>
+            <li><a href="#interattivo">2. Mezzi Trasmissivi (Esploratore Interattivo)</a></li>
+            <li><a href="#fibra-dettaglio">3. Focus sulla Fibra Ottica</a></li>
+        </ul>
+    </div>
+
+    <h2 id="segnali">1. Segnali e Disturbi</h2>
+    <p>Per viaggiare su un mezzo, i bit devono essere convertiti in segnali. Esistono due macro-categorie:</p>
+    <ul>
+        <li><strong>Segnali Analogici:</strong> Variano in modo continuo nel tempo (es. un'onda sinusoidale). Sono molto soggetti a distorsioni.</li>
+        <li><strong>Segnali Digitali:</strong> Assumono solo valori discreti (es. +5V per il bit "1" e 0V per il bit "0"). Sono più resistenti al rumore perché è più facile distinguere due stati netti.</li>
+    </ul>
+
+    
+
+    <p>Durante il tragitto, il segnale subisce inevitabilmente delle alterazioni note come <strong>disturbi</strong>:</p>
+    <ul>
+        <li><strong>Attenuazione:</strong> La perdita di energia del segnale man mano che viaggia. Se il cavo è troppo lungo, il segnale diventa illeggibile.</li>
+        <li><strong>Rumore (Noise):</strong> Segnali indesiderati (es. interferenze elettromagnetiche o EMI) che si sommano al segnale originale alterandolo.</li>
+        <li><strong>Diafonia (Crosstalk):</strong> Un'interferenza specifica che avviene quando il segnale di un cavo "sconfina" e disturba il cavo adiacente (classico nei cavi in rame).</li>
+    </ul>
+
+    <hr>
+
+    <h2 id="interattivo">2. Mezzi Trasmissivi (Esploratore Interattivo)</h2>
+    <p>Seleziona una delle schede qui sotto per esplorare i principali mezzi fisici utilizzati nelle reti di telecomunicazione.</p>
+
+    <div class="tab-container">
+        <div class="tab-buttons">
+            <button class="tab-button active" onclick="openTab(event, 'Rame')">Cavi in Rame (Twisted Pair)</button>
+            <button class="tab-button" onclick="openTab(event, 'Fibra')">Fibra Ottica</button>
+            <button class="tab-button" onclick="openTab(event, 'Wireless')">Wireless (Onde Radio)</button>
+        </div>
+
+        <div id="Rame" class="tab-content active">
+            <h3>Doppino Intrecciato (Twisted Pair)</h3>
+            <p>È il mezzo trasmissivo più diffuso nelle reti LAN (Ethernet). Consiste in coppie di fili di rame intrecciati tra loro. L'intreccio è fondamentale: serve a cancellare le interferenze elettromagnetiche esterne e la diafonia (crosstalk) tra le coppie.</p>
+            
+            
+
+            <ul>
+                <li><strong>UTP (Unshielded Twisted Pair):</strong> Non schermato. Economico, flessibile e facilissimo da installare. È lo standard per le case e le scuole.</li>
+                <li><strong>STP/FTP (Shielded/Foiled):</strong> Schermato con una calza metallica o un foglio di alluminio. Protegge meglio dalle interferenze (usato in ambienti industriali), ma è più rigido e costoso.</li>
+            </ul>
+            <p>I cavi UTP sono classificati in <strong>Categorie (Cat)</strong>. Ad esempio, un cavo Cat 5e arriva a 1 Gbps, mentre un Cat 6 o Cat 6a può supportare velocità fino a 10 Gbps su distanze più brevi.</p>
+            <div class="info-box"><strong>Connettore:</strong> Il connettore standard per questi cavi si chiama <strong>RJ-45</strong>.</div>
+        </div>
+
+        <div id="Fibra" class="tab-content">
+            <h3>Cavi in Fibra Ottica</h3>
+            <p>A differenza del rame che trasmette impulsi elettrici, la fibra ottica trasmette <strong>impulsi di luce</strong> (generati da LED o Laser) all'interno di un sottilissimo filo di vetro o plastica.</p>
+            <ul>
+                <li><strong>Immunità:</strong> Essendo luce, è totalmente immune alle interferenze elettromagnetiche (EMI) e non genera diafonia.</li>
+                <li><strong>Distanza e Velocità:</strong> Ha un'attenuazione bassissima, permettendo di trasportare decine o centinaia di Gigabit al secondo per chilometri senza bisogno di amplificatori.</li>
+            </ul>
+            <p>Scorri in basso alla sezione "Focus" per vedere i dettagli strutturali e la differenza tra fibra Monomodale e Multimodale!</p>
+        </div>
+
+        <div id="Wireless" class="tab-content">
+            <h3>Onde Radio (Wireless)</h3>
+            <p>I mezzi "non guidati" non usano cavi fisici, ma irradiano onde elettromagnetiche nell'aria (o nel vuoto).</p>
+            <ul>
+                <li><strong>Vantaggi:</strong> Mobilità assoluta (es. Wi-Fi, 4G/5G, Bluetooth).</li>
+                <li><strong>Svantaggi:</strong> Fortemente soggetti a ostacoli (muri, pioggia), interferenze (altri dispositivi sulla stessa frequenza) e problemi di sicurezza (chiunque nel raggio d'azione può intercettare il segnale, per cui la crittografia è obbligatoria).</li>
+            </ul>
+            <p>Nel Wi-Fi domestico, si usano tipicamente le frequenze dei <strong>2.4 GHz</strong> (più portata, meno velocità, più affollata) e <strong>5 GHz</strong> (meno portata, più velocità, meno interferenze).</p>
+        </div>
+    </div>
+
+    <hr>
+
+    <h2 id="fibra-dettaglio">3. Focus sulla Fibra Ottica</h2>
+    
+    <p>La fibra ottica è il "dorso" (backbone) di Internet. Senza di essa, le comunicazioni intercontinentali ad alta velocità non sarebbero possibili.</p>
+
+    <h3>Struttura del cavo</h3>
+    <p>Un singolo cavo in fibra ottica è composto da strati concentrici:</p>
+    
+    
+
+    <table class="wikitable">
+        <tr>
+            <th>Strato</th>
+            <th>Descrizione</th>
+        </tr>
+        <tr>
+            <td><strong>Core (Nucleo)</strong></td>
+            <td>La parte centrale in vetro purissimo (silice) dove viaggia effettivamente la luce.</td>
+        </tr>
+        <tr>
+            <td><strong>Cladding (Mantello)</strong></td>
+            <td>Un secondo strato di vetro che avvolge il core. Ha un indice di rifrazione diverso, in modo da far "rimbalzare" la luce all'interno del core (riflessione totale interna), impedendole di uscire.</td>
+        </tr>
+        <tr>
+            <td><strong>Coating / Buffer</strong></td>
+            <td>Rivestimento plastico che protegge il vetro da graffi e umidità.</td>
+        </tr>
+        <tr>
+            <td><strong>Jacket (Guaina)</strong></td>
+            <td>La guaina esterna finale (spesso gialla o azzurra/arancione a seconda del tipo) che dà resistenza meccanica al cavo.</td>
+        </tr>
+    </table>
+
+    <h3>Monomodale vs Multimodale</h3>
+    <p>Le fibre ottiche si dividono in due grandi famiglie in base al diametro del loro nucleo (core):</p>
+
+    <ul>
+        <li><strong>Monomodale (Single-mode - SMF):</strong> 
+            Ha un core piccolissimo (circa 8-10 micron). La luce (solitamente generata da un Laser) viaggia in linea retta in un solo "modo" (un solo raggio). 
+            <br><em>Uso:</em> Ideale per le lunghissime distanze (collegamenti tra città, cavi sottomarini, dorsali Internet). Cavi tipicamente di colore giallo.
+        </li>
+        <li><strong>Multimodale (Multi-mode - MMF):</strong> 
+            Ha un core più largo (50 o 62.5 micron). La luce (spesso generata da LED) entra con diverse angolazioni e viaggia rimbalzando nel tubo creando più "modi" o percorsi. Questo causa un po' di dispersione del segnale.
+            <br><em>Uso:</em> Ideale per distanze brevi e medie (es. collegamenti all'interno di un datacenter o tra edifici dello stesso campus scolastico).
+        </li>
+    </ul>
+
+</div>
+
+<script>
+    // Funzione per il tab menu
+    function openTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+        
+        tabcontent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+            tabcontent[i].classList.remove("active");
+        }
+        
+        tablinks = document.getElementsByClassName("tab-button");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+        
+        document.getElementById(tabName).style.display = "block";
+        document.getElementById(tabName).classList.add("active");
+        evt.currentTarget.className += " active";
+    }
+</script>
+
+</body>
+</html>
