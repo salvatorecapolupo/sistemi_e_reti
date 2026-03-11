@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modelli di Rete: OSI e TCP/IP - Sistemi e Reti</title>
+    <style>
+        :root {
+            --wiki-bg: #f6f6f6;
+            --wiki-border: #a2a9b1;
+            --wiki-blue: #0645ad;
+            --layer-app: #fbb4ae;
+            --layer-pres: #b3cde3;
+            --layer-sess: #ccebc5;
+            --layer-trans: #decbe4;
+            --layer-net: #fed9a6;
+            --layer-link: #ffffcc;
+            --layer-phys: #e5d8bd;
+        }
+
+        body {
+            font-family: sans-serif;
+            background-color: var(--wiki-bg);
+            color: #202122;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            background: white;
+            padding: 30px;
+            border: 1px solid var(--wiki-border);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        h1, h2, h3 {
+            font-family: "Linux Libertine", "Georgia", "Times", serif;
+            border-bottom: 1px solid var(--wiki-border);
+            padding-bottom: 5px;
+            font-weight: normal;
+        }
+
+        h1 { font-size: 2em; margin-top: 0; }
+        
+        a { color: var(--wiki-blue); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        /* Simulator Styles */
+        .simulator-container {
+            background: #f8f9fa;
+            border: 1px solid var(--wiki-border);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .sim-controls {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .sim-controls button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            background: white;
+            border-radius: 4px;
+            margin: 0 5px;
+        }
+
+        .sim-controls button.active {
+            background: var(--wiki-blue);
+            color: white;
+            border-color: var(--wiki-blue);
+        }
+
+        .sim-layout {
+            display: flex;
+            gap: 20px;
+        }
+
+        .stack {
+            flex: 1;
+            display: flex;
+            flex-direction: column-reverse; /* Bottom layer at bottom */
+            gap: 5px;
+        }
+
+        .layer {
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            border: 1px solid #888;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .layer:hover, .layer.active {
+            filter: brightness(0.9);
+            transform: scale(1.02);
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .sim-info {
+            flex: 2;
+            background: white;
+            border: 1px solid var(--wiki-border);
+            padding: 20px;
+            border-radius: 4px;
+            min-height: 250px;
+        }
+
+        .sim-info h3 { border-bottom: none; margin-top: 0; }
+        .badge { display: inline-block; padding: 3px 8px; background: #eee; border-radius: 12px; font-size: 0.85em; margin: 2px; }
+
+        /* Table of Contents */
+        .toc {
+            background: #f8f9fa;
+            border: 1px solid var(--wiki-border);
+            padding: 15px;
+            display: inline-block;
+            margin: 20px 0;
+            font-size: 0.95em;
+        }
+        .toc ul { list-style: none; padding-left: 20px; }
+        .toc > ul { padding-left: 0; }
+        
+        table.wikitable {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table.wikitable th, table.wikitable td {
+            border: 1px solid var(--wiki-border);
+            padding: 8px;
+            text-align: left;
+        }
+        table.wikitable th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Modelli di Rete: ISO/OSI e TCP/IP</h1>
+    
+    <p>Nelle telecomunicazioni e nell'informatica, i <strong>modelli di rete</strong> sono architetture logiche che descrivono il processo di comunicazione tra due dispositivi su una rete. I due modelli principali studiati in <i>Sistemi e Reti</i> sono il modello <strong>ISO/OSI</strong> (teorico e di riferimento) e il modello <strong>TCP/IP</strong> (pratico e base dell'attuale Internet).</p>
+
+    <div class="simulator-container">
+        <h2>Simulatore Interattivo dei Livelli</h2>
+        <p>Seleziona il modello e clicca sui livelli per scoprirne le funzioni e gli esempi.</p>
+        
+        <div class="sim-controls">
+            <button id="btn-osi" class="active" onclick="setMode('osi')">Modello ISO/OSI (7 Livelli)</button>
+            <button id="btn-tcp" onclick="setMode('tcp')">Modello TCP/IP (4 Livelli)</button>
+        </div>
+
+        <div class="sim-layout">
+            <div class="stack" id="layer-stack">
+                </div>
+            <div class="sim-info" id="info-panel">
+                <h3 id="info-title">Seleziona un livello</h3>
+                <p id="info-desc">Clicca su uno dei livelli nello stack a sinistra per visualizzare i dettagli, le funzioni e i protocolli associati.</p>
+                <div id="info-protocols"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toc">
+        <b>Indice</b>
+        <ul>
+            <li><a href="#enti">1. Enti di Standardizzazione Principali</a></li>
+            <li><a href="#osi">2. Il Modello ISO/OSI</a></li>
+            <li><a href="#tcpip">3. Il Modello TCP/IP</a></li>
+            <li><a href="#confronto">4. Confronto tra i due modelli</a></li>
+        </ul>
+    </div>
+
+    <h2 id="enti">1. Enti di Standardizzazione Principali</h2>
+    <p>Senza gli standard, computer di produttori diversi non potrebbero comunicare. Ecco le organizzazioni che definiscono le "regole del gioco":</p>
+    <ul>
+        <li><strong>ISO (International Organization for Standardization):</strong> Un'organizzazione mondiale che definisce standard per innumerevoli settori. In ambito informatico, è famosa per aver creato il modello di riferimento OSI nel 1984.</li>
+        <li><strong>IEEE (Institute of Electrical and Electronics Engineers):</strong> Associazione professionale di ingegneri focalizzata sui livelli hardware e data link. Hanno creato gli standard della famiglia <strong>IEEE 802</strong> (es. 802.3 per Ethernet, 802.11 per il Wi-Fi).</li>
+        <li><strong>IETF (Internet Engineering Task Force):</strong> Si occupa dello sviluppo e della promozione degli standard di Internet (modello TCP/IP). Pubblicano documenti chiamati <strong>RFC (Request for Comments)</strong>.</li>
+        <li><strong>ITU-T (International Telecommunication Union):</strong> Un'agenzia delle Nazioni Unite che gestisce gli standard per le telecomunicazioni mondiali (es. infrastrutture telefoniche e fibre ottiche).</li>
+    </ul>
+
+    <hr>
+
+    <h2 id="osi">2. Il Modello ISO/OSI</h2>
+    <p>Il modello <strong>Open Systems Interconnection (OSI)</strong> divide la comunicazione di rete in 7 strati (layer) logici. È un modello teorico: ogni livello fornisce servizi al livello superiore e richiede servizi a quello inferiore, incapsulando i dati.</p>
+    
+    <table class="wikitable">
+        <tr>
+            <th>Livello</th>
+            <th>Nome</th>
+            <th>PDU (Protocol Data Unit)</th>
+            <th>Funzione Principale e Dispositivi</th>
+        </tr>
+        <tr style="background-color: var(--layer-app)">
+            <td>7</td>
+            <td>Applicazione</td>
+            <td>Dato</td>
+            <td>Interfaccia utente/rete (es. Browser). Fornisce servizi di rete diretti alle app.</td>
+        </tr>
+        <tr style="background-color: var(--layer-pres)">
+            <td>6</td>
+            <td>Presentazione</td>
+            <td>Dato</td>
+            <td>Formattazione, compressione e crittografia dei dati (es. JPEG, SSL/TLS).</td>
+        </tr>
+        <tr style="background-color: var(--layer-sess)">
+            <td>5</td>
+            <td>Sessione</td>
+            <td>Dato</td>
+            <td>Instaura, mantiene e chiude le sessioni di comunicazione tra host.</td>
+        </tr>
+        <tr style="background-color: var(--layer-trans)">
+            <td>4</td>
+            <td>Trasporto</td>
+            <td>Segmento / Datagramma</td>
+            <td>Controllo del flusso, affidabilità (TCP) o velocità (UDP). Frammentazione e riassemblaggio.</td>
+        </tr>
+        <tr style="background-color: var(--layer-net)">
+            <td>3</td>
+            <td>Rete (Network)</td>
+            <td>Pacchetto</td>
+            <td>Indirizzamento logico (IP) e instradamento (Routing). <em>Dispositivo: Router</em>.</td>
+        </tr>
+        <tr style="background-color: var(--layer-link)">
+            <td>2</td>
+            <td>Collegamento Dati</td>
+            <td>Trama (Frame)</td>
+            <td>Indirizzamento fisico (MAC), rilevamento errori in ambito locale. <em>Dispositivo: Switch</em>.</td>
+        </tr>
+        <tr style="background-color: var(--layer-phys)">
+            <td>1</td>
+            <td>Fisico</td>
+            <td>Bit</td>
+            <td>Trasmissione fisica del segnale (elettrico, ottico, radio) sui mezzi trasmissivi (Cavi, Fibra). <em>Dispositivo: Hub, Cavi</em>.</td>
+        </tr>
+    </table>
+
+    <hr>
+
+    <h2 id="tcpip">3. Il Modello TCP/IP</h2>
+    <p>A differenza dell'OSI, il <strong>Transmission Control Protocol/Internet Protocol (TCP/IP)</strong> è nato "sul campo" (sviluppato dal DoD americano per ARPANET). Ha una struttura più snella a 4 livelli (a volte descritta a 5 livelli separando l'accesso di rete, ma lo standard ufficiale RFC 1122 ne prevede 4).</p>
+    <ul>
+        <li><strong>Applicazione:</strong> Raggruppa le funzioni dei livelli 5, 6 e 7 dell'OSI. Si occupa dei protocolli di alto livello (HTTP, DNS, FTP).</li>
+        <li><strong>Trasporto:</strong> Esattamente come nell'OSI, gestisce la comunicazione end-to-end (TCP per affidabilità, UDP per velocità).</li>
+        <li><strong>Internet:</strong> Corrisponde al livello Rete dell'OSI. Usa il protocollo IP per instradare i pacchetti a destinazione.</li>
+        <li><strong>Accesso di Rete (Network Access):</strong> Raggruppa livello Fisico e Data Link dell'OSI. Si occupa dell'interfaccia con la rete fisica (es. Ethernet, Wi-Fi).</li>
+    </ul>
+
+    <hr>
+
+    <h2 id="confronto">4. Confronto tra i due modelli</h2>
+    <p>Il modello OSI è eccellente per <strong>spiegare</strong> e <strong>studiare</strong> come funzionano le reti ed è lo standard per fare <i>troubleshooting</i> (la risoluzione dei problemi parte dal "Livello 1" per salire). Il TCP/IP, tuttavia, è il protocollo <strong>effettivamente utilizzato</strong> su Internet.</p>
+</div>
+
+<script>
+    // Dati per il simulatore
+    const dataOSI = [
+        { num: 1, name: "1. Fisico", color: "var(--layer-phys)", desc: "Si occupa di trasmettere e ricevere il flusso di bit grezzo su un mezzo fisico.", example: "Un cavo Ethernet (Cat 6), la fibra ottica, o le onde radio del Wi-Fi.", protos: ["Ethernet (IEEE 802.3 PHY)", "Bluetooth PHY", "USB"] },
+        { num: 2, name: "2. Collegamento Dati", color: "var(--layer-link)", desc: "Raggruppa i bit in 'Trame' (Frame). Garantisce il trasferimento affidabile di dati attraverso un collegamento fisico locale usando gli indirizzi MAC.", example: "Lo switch in un laboratorio scolastico che inoltra le trame usando il MAC Address delle schede di rete.", protos: ["Ethernet (MAC)", "PPP", "Wi-Fi (IEEE 802.11 MAC)"] },
+        { num: 3, name: "3. Rete", color: "var(--layer-net)", desc: "Determina il percorso migliore (Routing) per muovere i 'Pacchetti' da un host mittente a un host destinatario usando indirizzi logici (IP).", example: "Il router di casa tua che instrada il pacchetto dal tuo PC verso i server di Google.", protos: ["IPv4", "IPv6", "ICMP (Ping)", "IPsec"] },
+        { num: 4, name: "4. Trasporto", color: "var(--layer-trans)", desc: "Garantisce la consegna end-to-end dei dati. Gestisce il controllo del flusso, la ritrasmissione dei pacchetti persi e usa i numeri di 'Porta'.", example: "Assicurarsi che un file scaricato non abbia byte mancanti (usando TCP) o inviare frame video in diretta il più velocemente possibile (usando UDP).", protos: ["TCP", "UDP"] },
+        { num: 5, name: "5. Sessione", color: "var(--layer-sess)", desc: "Stabilisce, gestisce e termina le connessioni (sessioni) tra le applicazioni.", example: "Mantenere attiva la connessione al database della scuola finché l'utente non fa il logout.", protos: ["NetBIOS", "RPC", "PAP"] },
+        { num: 6, name: "6. Presentazione", color: "var(--layer-pres)", desc: "Traduce, formatta, comprime e cripta i dati. Rende i dati comprensibili al livello Applicazione.", example: "Criptare i dati della tua carta di credito tramite SSL/TLS prima di inviarli, o la codifica ASCII del testo.", protos: ["SSL/TLS", "JPEG", "ASCII", "MPEG"] },
+        { num: 7, name: "7. Applicazione", color: "var(--layer-app)", desc: "Fornisce servizi di rete direttamente alle applicazioni dell'utente. È il livello più vicino all'utente finale.", example: "Il tuo browser Chrome che richiede una pagina web, o il client di posta che invia un'email.", protos: ["HTTP / HTTPS", "SMTP / IMAP", "DNS", "FTP"] }
+    ];
+
+    const dataTCP = [
+        { num: 1, name: "1. Accesso di Rete", color: "var(--layer-phys)", desc: "Combina i livelli Fisico e Data Link dell'OSI. Mette i pacchetti IP in frame e li invia fisicamente sul mezzo.", example: "Una scheda di rete Wi-Fi che invia un segnale radio al modem/router.", protos: ["Ethernet", "Wi-Fi", "ARP"] },
+        { num: 2, name: "2. Internet", color: "var(--layer-net)", desc: "Corrisponde al livello Rete dell'OSI. Si assicura che i pacchetti trovino la strada attraverso diverse reti interconnesse.", example: "Assegnare l'indirizzo IP 192.168.1.5 al tuo PC per identificarlo nella rete internet.", protos: ["IP (IPv4, IPv6)", "ICMP"] },
+        { num: 3, name: "3. Trasporto", color: "var(--layer-trans)", desc: "Stessa funzione del livello 4 OSI. Distingue le varie applicazioni in esecuzione sullo stesso computer tramite le porte (es. porta 80 per HTTP).", example: "Dividere un grosso video in piccoli segmenti e numerarli per riassemblarli a destinazione.", protos: ["TCP", "UDP"] },
+        { num: 4, name: "4. Applicazione", color: "var(--layer-app)", desc: "Combina i livelli 5, 6 e 7 dell'OSI. Comprende tutti i protocolli di alto livello necessari per l'utilizzo dei servizi internet.", example: "Tradurre l'URL 'www.google.it' in un indirizzo IP tramite il DNS.", protos: ["HTTP", "DNS", "DHCP", "SSH"] }
+    ];
+
+    let currentMode = 'osi';
+
+    function setMode(mode) {
+        currentMode = mode;
+        document.getElementById('btn-osi').className = mode === 'osi' ? 'active' : '';
+        document.getElementById('btn-tcp').className = mode === 'tcp' ? 'active' : '';
+        
+        // Reset info panel
+        document.getElementById('info-title').innerText = "Seleziona un livello";
+        document.getElementById('info-desc').innerText = "Clicca su uno dei livelli nello stack a sinistra per visualizzare i dettagli.";
+        document.getElementById('info-protocols').innerHTML = "";
+
+        renderStack();
+    }
+
+    function renderStack() {
+        const stackEl = document.getElementById('layer-stack');
+        stackEl.innerHTML = '';
+        const data = currentMode === 'osi' ? dataOSI : dataTCP;
+
+        data.forEach(layer => {
+            const div = document.createElement('div');
+            div.className = 'layer';
+            div.style.backgroundColor = layer.color;
+            div.innerText = layer.name;
+            div.onclick = () => showInfo(layer, div);
+            stackEl.appendChild(div);
+        });
+    }
+
+    function showInfo(layer, el) {
+        // Rimuovi classe active da tutti
+        document.querySelectorAll('.layer').forEach(l => l.classList.remove('active'));
+        el.classList.add('active');
+
+        document.getElementById('info-title').innerText = `Livello: ${layer.name}`;
+        document.getElementById('info-desc').innerHTML = `
+            <strong>Cosa fa:</strong> ${layer.desc}<br><br>
+            <strong>Esempio reale:</strong> <em>${layer.example}</em>
+        `;
+        
+        let badges = layer.protos.map(p => `<span class="badge">${p}</span>`).join('');
+        document.getElementById('info-protocols').innerHTML = `<strong>Protocolli principali:</strong><br>${badges}`;
+    }
+
+    // Init
+    renderStack();
+</script>
+
+</body>
+</html>
