@@ -107,7 +107,13 @@
 
         .tool-header h3 { border: none; margin: 0; font-family: sans-serif; font-weight: bold; }
 
-        .score-display {
+        .score-board {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .score-display, .attempt-display {
             font-size: 1.1em;
             font-weight: bold;
             padding: 5px 10px;
@@ -130,6 +136,7 @@
         .btn:hover { background-color: var(--wiki-blue-hover); }
         .btn-secondary { background-color: #6c757d; }
         .btn-secondary:hover { background-color: #5a6268; }
+        .btn:disabled { background-color: #aaa; cursor: not-allowed; }
 
         .exercise-box {
             background: #fff;
@@ -208,6 +215,8 @@
     <h2>1. Composizione e Logica degli Indirizzi IPv4</h2>
     <p>Un indirizzo IPv4 è formato da 32 bit, generalmente raggruppati in quattro byte (o ottetti) e scritti in formato decimale separati da un punto. Strutturalmente, ogni indirizzo si divide in due sezioni logiche:</p>
     
+    
+    
     <ul>
         <li><strong>Identificativo di Rete (NetID):</strong> Indica la specifica rete logica in cui il dispositivo è inserito.</li>
         <li><strong>Identificativo di Host (HostID):</strong> Distingue il singolo terminale all'interno di quella specifica rete.</li>
@@ -215,6 +224,8 @@
 
     <h2>2. Classi di Indirizzamento Storiche</h2>
     <p>In origine, la suddivisione tra bit di Rete e bit di Host avveniva in modo rigido in base al valore dei primi bit dell'indirizzo (metodo <em>classful</em>). Le classi utilizzabili per l'assegnazione agli host erano tre:</p>
+    
+    
     
     <table class="wikitable">
         <tr>
@@ -247,18 +258,22 @@
     <h2>3. Subnetting e CIDR</h2>
     <p>Per limitare gli sprechi di IP e migliorare le prestazioni, l'approccio classful è stato sostituito dal <strong>Subnetting</strong>. Questo processo consiste nel sottrarre dei bit alla porzione host originaria per assegnarli all'identificativo di rete, creando di fatto delle sottoreti (Subnet).</p>
     
+    
+    
     <p>La quantità di bit destinati alla rete viene oggi indicata tramite la notazione <strong>CIDR</strong> (es. /24, /26, /18), che corrisponde al numero di bit a "1" presenti nella <em>Subnet Mask</em>.</p>
 
 
     <h2 id="esercizi">4. Masterclass Subnetting: Generatore e Correttore Avanzato</h2>
-    <p>Usa questo strumento per esercitarti sui calcoli di rete complessi. Il sistema genererà un IP casuale con una maschera a lunghezza variabile (CIDR da /8 a /30). Calcola i parametri richiesti esattamente come faresti in una verifica scolastica o con un calcolatore di sottoreti professionale. Puoi tentare quante volte vuoi, ma ogni errore ridurrà il tuo punteggio!</p>
+    <p>Usa questo strumento per esercitarti sui calcoli di rete complessi. Il sistema genererà un IP casuale con una maschera a lunghezza variabile (CIDR da /8 a /30).</p>
+    <p><strong>Regole:</strong> Hai a disposizione <strong>massimo 3 tentativi</strong>. Il punteggio è calcolato in base alle risposte esatte fornite. Nei primi due tentativi ti verrà indicato solo quali campi hai sbagliato, senza rivelare la soluzione. Se esaurisci i tentativi, le soluzioni verranno svelate e l'esercizio sarà terminato.</p>
 
     <div class="tool-container">
         <div class="tool-header">
             <h3>Laboratorio di Indirizzamento</h3>
-            <div>
-                <span class="score-display" id="score-display">Punteggio: 100%</span>
-                <button class="btn btn-secondary" onclick="generateComplexExercise()" style="margin-left: 15px;">Genera Nuova Rete Casuale</button>
+            <div class="score-board">
+                <span class="attempt-display" id="attempt-display">Tentativo: 1/3</span>
+                <span class="score-display" id="score-display">Punteggio: 0%</span>
+                <button class="btn btn-secondary" onclick="generateComplexExercise()">Genera Nuova Rete Casuale</button>
             </div>
         </div>
 
@@ -310,7 +325,7 @@
         </div>
 
         <div style="text-align: center; margin-top: 30px;">
-            <button class="btn" onclick="verifyComplexExercise()" style="width: 250px; padding: 14px; font-size: 16px;">Verifica i tuoi Calcoli</button>
+            <button id="verify-btn" class="btn" onclick="verifyComplexExercise()" style="width: 250px; padding: 14px; font-size: 16px;">Verifica i tuoi Calcoli</button>
         </div>
 
         <div id="feedback" class="feedback"></div>
@@ -320,7 +335,8 @@
 
 <script>
     let currentEx = null;
-    let currentScore = 100.0;
+    let currentAttempt = 1;
+    const maxAttempts = 3;
 
     // Helper matematici per IP
     function ip2long(ip) {
@@ -332,14 +348,15 @@
     }
 
     function generateComplexExercise() {
-        // Reset interfaccia e punteggio
+        // Reset interfaccia
         document.querySelectorAll('.form-group input').forEach(input => input.value = "");
         document.getElementById('in-class').value = "";
         document.getElementById('feedback').className = "feedback";
         document.getElementById('feedback').style.display = "none";
+        document.getElementById('verify-btn').disabled = false;
         
-        currentScore = 100.0;
-        updateScoreDisplay();
+        currentAttempt = 1;
+        updateStatusDisplay(0.0);
 
         // Generazione IP Casuale valido (Evitando 127.x.x.x e Multicast/Class E)
         let o1 = Math.floor(Math.random() * 223) + 1;
@@ -384,12 +401,14 @@
             hosts: usableHosts.toString()
         };
 
-        // Mostra a schermo
+        // Mostra a schermo l'esercizio
         document.getElementById('ex-ip-cidr').innerText = `${currentEx.ip} /${currentEx.cidr}`;
     }
 
-    function updateScoreDisplay() {
-        document.getElementById('score-display').innerText = `Punteggio: ${currentScore.toFixed(1)}%`;
+    function updateStatusDisplay(score) {
+        document.getElementById('score-display').innerText = `Punteggio: ${score.toFixed(1)}%`;
+        let visualAttempt = currentAttempt > maxAttempts ? maxAttempts : currentAttempt;
+        document.getElementById('attempt-display').innerText = `Tentativo: ${visualAttempt}/${maxAttempts}`;
     }
 
     function verifyComplexExercise() {
@@ -398,37 +417,82 @@
             return;
         }
 
-        let uClass = document.getElementById('in-class').value;
-        let uMask = document.getElementById('in-mask').value.trim();
-        let uNet = document.getElementById('in-net').value.trim();
-        let uFirst = document.getElementById('in-first').value.trim();
-        let uLast = document.getElementById('in-last').value.trim();
-        let uBcast = document.getElementById('in-bcast').value.trim();
-        let uHosts = document.getElementById('in-hosts').value.trim();
+        // Definizione dei campi da controllare
+        const fields = [
+            { id: 'in-class', value: document.getElementById('in-class').value, expected: currentEx.storicClass, name: "Classe Storica" },
+            { id: 'in-mask', value: document.getElementById('in-mask').value.trim(), expected: currentEx.mask, name: "Subnet Mask" },
+            { id: 'in-net', value: document.getElementById('in-net').value.trim(), expected: currentEx.network, name: "Indirizzo di Rete" },
+            { id: 'in-first', value: document.getElementById('in-first').value.trim(), expected: currentEx.first, name: "Primo IP Assegnabile" },
+            { id: 'in-last', value: document.getElementById('in-last').value.trim(), expected: currentEx.last, name: "Ultimo IP Assegnabile" },
+            { id: 'in-bcast', value: document.getElementById('in-bcast').value.trim(), expected: currentEx.broadcast, name: "Indirizzo di Broadcast" },
+            { id: 'in-hosts', value: document.getElementById('in-hosts').value.trim(), expected: currentEx.hosts, name: "Numero Totale Host" }
+        ];
 
-        let errors = [];
+        let wrongFields = [];
+        let missingFields = [];
+        let correctCount = 0;
 
-        if (uClass !== currentEx.storicClass) errors.push(`<strong>Classe:</strong> errata. L'IP ${currentEx.ip} appartiene alla Classe ${currentEx.storicClass}.`);
-        if (uMask !== currentEx.mask) errors.push(`<strong>Subnet Mask:</strong> errata. Il valore corretto per /${currentEx.cidr} è ${currentEx.mask}.`);
-        if (uNet !== currentEx.network) errors.push(`<strong>Indirizzo di Rete:</strong> errato. Il valore corretto è ${currentEx.network}.`);
-        if (uFirst !== currentEx.first) errors.push(`<strong>Primo IP:</strong> errato. Il valore corretto è ${currentEx.first}.`);
-        if (uLast !== currentEx.last) errors.push(`<strong>Ultimo IP:</strong> errato. Il valore corretto è ${currentEx.last}.`);
-        if (uBcast !== currentEx.broadcast) errors.push(`<strong>Broadcast:</strong> errato. Il valore corretto è ${currentEx.broadcast}.`);
-        if (uHosts !== currentEx.hosts) errors.push(`<strong>Host Totali:</strong> errato. Con ${32 - currentEx.cidr} bit per l'host, il numero è ${currentEx.hosts}.`);
+        // Validazione dei campi
+        fields.forEach(f => {
+            if (f.value === "") {
+                missingFields.push(f.name);
+            } else if (f.value !== f.expected) {
+                wrongFields.push(f.name);
+            } else {
+                correctCount++;
+            }
+        });
+
+        // Calcolo punteggio: proporzionale ai campi corretti (su 7 totali)
+        // Opzionale: applichiamo una lieve penalità per ogni tentativo oltre il primo (-5% a tentativo)
+        let baseScore = (correctCount / fields.length) * 100;
+        let penalty = (currentAttempt - 1) * 5;
+        let finalScore = Math.max(0, baseScore - penalty);
+
+        updateStatusDisplay(finalScore);
 
         let fb = document.getElementById('feedback');
         fb.style.display = "block";
 
-        if (errors.length === 0) {
+        if (correctCount === fields.length) {
+            // VITTORIA
             fb.className = "feedback success";
-            fb.innerHTML = `<strong>Ottimo lavoro!</strong><br>Hai modellato e calcolato la sottorete in modo impeccabile.<br><br><span class="score-highlight">Punteggio finale: ${currentScore.toFixed(1)}%</span>`;
+            fb.innerHTML = `<strong>Ottimo lavoro!</strong><br>Hai modellato e calcolato la sottorete in modo impeccabile.<br><br><span class="score-highlight">Punteggio finale: ${finalScore.toFixed(1)}%</span>`;
+            document.getElementById('verify-btn').disabled = true;
         } else {
-            // Sottrai 0.5% in caso di errore
-            currentScore = Math.max(0, currentScore - 0.5);
-            updateScoreDisplay();
-            
-            fb.className = "feedback error";
-            fb.innerHTML = `<strong>Ci sono alcune imprecisioni nei calcoli:</strong><ul>` + errors.map(e => `<li>${e}</li>`).join('') + `</ul><br><em>Hai perso 0.5 punti percentuali. Riprova! <br><span class="score-highlight">Punteggio attuale: ${currentScore.toFixed(1)}%</span></em>`;
+            // ERRORE O CAMPI MANCANTI
+            if (currentAttempt < maxAttempts) {
+                // Tentativi ancora disponibili (NON mostrare le soluzioni)
+                let errorMsg = `<strong>Attenzione, ci sono errori nel tuo calcolo.</strong><br>`;
+                if (wrongFields.length > 0) {
+                    errorMsg += `<br>Hai inserito un valore errato nei seguenti campi: <ul><li>${wrongFields.join('</li><li>')}</li></ul>`;
+                }
+                if (missingFields.length > 0) {
+                    errorMsg += `<br>I seguenti campi sono stati lasciati in bianco: <ul><li>${missingFields.join('</li><li>')}</li></ul>`;
+                }
+                
+                errorMsg += `<br><em>Ti restano ${maxAttempts - currentAttempt} tentativi per correggere!</em>`;
+                
+                fb.className = "feedback error";
+                fb.innerHTML = errorMsg;
+                currentAttempt++;
+                
+                // Aggiorna a schermo il numero del prossimo tentativo
+                let nextAttempt = currentAttempt > maxAttempts ? maxAttempts : currentAttempt;
+                document.getElementById('attempt-display').innerText = `Tentativo: ${nextAttempt}/${maxAttempts}`;
+
+            } else {
+                // GAME OVER (Tentativi esauriti, MOSTRA le soluzioni)
+                let solutionsHtml = fields.map(f => `<li><strong>${f.name}:</strong> ${f.expected}</li>`).join('');
+                
+                fb.className = "feedback error";
+                fb.innerHTML = `<strong>Hai esaurito i ${maxAttempts} tentativi! Esercizio terminato.</strong><br><br>
+                                <span class="score-highlight">Il tuo punteggio finale è: ${finalScore.toFixed(1)}%</span><br><br>
+                                Ecco le risposte corrette che dovevi inserire:
+                                <ul>${solutionsHtml}</ul>`;
+                
+                document.getElementById('verify-btn').disabled = true;
+            }
         }
     }
 
