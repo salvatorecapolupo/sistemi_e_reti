@@ -12,9 +12,9 @@
             --wiki-blue-hover: #0b0080;
             --layer-net: #fed9a6;
             --success: #d5fdf4;
-            --success-text: #006b54;
+            --success-border: #006b54;
             --error: #fde8e8;
-            --error-text: #b30000;
+            --error-border: #b30000;
         }
 
         body {
@@ -120,6 +120,7 @@
             border-radius: 4px;
             background: #fff;
             border: 1px solid #ccc;
+            color: black;
         }
 
         .btn {
@@ -170,10 +171,13 @@
         .form-group label { font-weight: bold; margin-bottom: 5px; font-size: 0.95em; color: #333;}
         .form-group input, .form-group select {
             padding: 10px;
-            border: 1px solid #ccc;
+            border: 2px solid #ccc;
             border-radius: 4px;
             font-size: 1em;
             font-family: monospace;
+            font-weight: bold;
+            color: black;
+            transition: border-color 0.3s, color 0.3s;
         }
         .form-group input:focus, .form-group select:focus {
             outline: none;
@@ -187,12 +191,13 @@
             border-radius: 4px;
             display: none;
             font-size: 1.05em;
+            color: black;
         }
-        .feedback.success { background-color: var(--success); color: var(--success-text); display: block; border: 1px solid var(--success-text);}
-        .feedback.error { background-color: var(--error); color: var(--error-text); display: block; border: 1px solid var(--error-text); }
+        .feedback.success { background-color: var(--success); display: block; border: 1px solid var(--success-border);}
+        .feedback.error { background-color: var(--error); display: block; border: 1px solid var(--error-border); }
         .feedback ul { margin: 10px 0 0 0; padding-left: 20px; }
         
-        .score-highlight { font-size: 1.2em; font-weight: bold; }
+        .score-highlight { font-size: 1.2em; font-weight: bold; color: black; }
     </style>
 </head>
 <body>
@@ -215,7 +220,8 @@
     
     <p>Un indirizzo IPv4 è formato da 32 bit raggruppati in quattro byte (definiti comunemente ottetti), ed è quasi sempre espresso nella notazione decimale puntata composta da quattro numeri compresi tra 0 e 255.</p>
 
-        
+    
+    
     <p>Dal punto di vista logico e di instradamento, l'indirizzo IP è formato da due porzioni fondamentali:</p>
     <ul>
         <li><strong>NetID (Identificativo di Rete):</strong> Indica la specifica rete logica in cui l'interfaccia dell'host è inserita.</li>
@@ -225,7 +231,8 @@
     <h2>2. Classi di Indirizzamento Storiche e Indirizzi Riservati</h2>
     <p>In origine, la suddivisione tra i bit destinati alla rete e quelli per l'host avveniva in modo rigido in base al valore assunto dai primi bit (i bit più significativi) dell'indirizzo, secondo un metodo denominato <em>classful</em>.</p>
     
-        
+    
+    
     <table class="wikitable">
         <tr>
             <th>Classe</th>
@@ -258,7 +265,8 @@
     <h2>3. Pianificazione di Reti: La Tecnica del Subnetting</h2>
     <p>Per limitare gli sprechi di indirizzi e ridurre il traffico (segmentando così i domini di broadcast), le reti vengono ulteriormente frazionate in unità logiche dette sottoreti, tramite la tecnica del <strong>Subnetting</strong>.</p>
     
-        
+    
+    
     <p>L'operazione in sé si concretizza "sacrificando" e convertendo un quantitativo di bit, originariamente dedicati alla sezione Host, per tramutarli in un <strong>SubnetID</strong>.</p>
 
     <h3>Metodo pratico di calcolo per il dimensionamento</h3>
@@ -271,7 +279,7 @@
 
     <h2 id="esercizi">4. Masterclass Subnetting: Generatore e Correttore Avanzato</h2>
     <p>Usa questo strumento per esercitarti sui calcoli di rete complessi. Il sistema genererà un IP casuale con una maschera a lunghezza variabile (CIDR da /8 a /30).</p>
-    <p><strong>Regole:</strong> Hai a disposizione <strong>massimo 3 tentativi</strong>. Il punteggio è calcolato in base alle risposte esatte fornite. Nei primi due tentativi ti verrà indicato solo quali campi hai sbagliato, senza rivelare la soluzione. Se esaurisci i tentativi, le soluzioni verranno svelate e l'esercizio sarà terminato.</p>
+    <p><strong>Regole:</strong> Hai a disposizione <strong>massimo 3 tentativi</strong>. Il punteggio è calcolato in base alle risposte esatte fornite. Nei primi due tentativi ti verrà indicato solo quali campi hai sbagliato (senza rivelare la soluzione) e le tue risposte si coloreranno di conseguenza. Se esaurisci i tentativi, le soluzioni verranno svelate e l'esercizio sarà terminato.</p>
 
     <div class="tool-container">
         <div class="tool-header">
@@ -290,7 +298,7 @@
 
         <div class="form-grid">
             <div class="form-group">
-                <label for="in-class">1. Classe Storica dell'IP</label>
+                <label for="in-class">1. Classe</label>
                 <select id="in-class">
                     <option value="">Seleziona la classe...</option>
                     <option value="A">Classe A</option>
@@ -354,9 +362,13 @@
     }
 
     function generateComplexExercise() {
-        // Reset interfaccia
-        document.querySelectorAll('.form-group input').forEach(input => input.value = "");
-        document.getElementById('in-class').value = "";
+        // Reset interfaccia e campi form
+        document.querySelectorAll('.form-group input, .form-group select').forEach(input => {
+            input.value = "";
+            input.style.borderColor = "#ccc";
+            input.style.color = "black";
+        });
+        
         document.getElementById('feedback').className = "feedback";
         document.getElementById('feedback').style.display = "none";
         document.getElementById('verify-btn').disabled = false;
@@ -425,32 +437,49 @@
 
         // Definizione dei campi da controllare
         const fields = [
-            { id: 'in-class', value: document.getElementById('in-class').value, expected: currentEx.storicClass, name: "Classe Storica" },
+            { id: 'in-class', value: document.getElementById('in-class').value, expected: currentEx.storicClass, name: "Classe" },
             { id: 'in-mask', value: document.getElementById('in-mask').value.trim(), expected: currentEx.mask, name: "Subnet Mask" },
             { id: 'in-net', value: document.getElementById('in-net').value.trim(), expected: currentEx.network, name: "Indirizzo di Rete" },
-            { id: 'in-first', value: document.getElementById('in-first').value.trim(), expected: currentEx.first, name: "Primo IP Assegnabile" },
-            { id: 'in-last', value: document.getElementById('in-last').value.trim(), expected: currentEx.last, name: "Ultimo IP Assegnabile" },
-            { id: 'in-bcast', value: document.getElementById('in-bcast').value.trim(), expected: currentEx.broadcast, name: "Indirizzo di Broadcast" },
-            { id: 'in-hosts', value: document.getElementById('in-hosts').value.trim(), expected: currentEx.hosts, name: "Numero Totale Host" }
+            { id: 'in-first', value: document.getElementById('in-first').value.trim(), expected: currentEx.first, name: "Primo IP" },
+            { id: 'in-last', value: document.getElementById('in-last').value.trim(), expected: currentEx.last, name: "Ultimo IP" },
+            { id: 'in-bcast', value: document.getElementById('in-bcast').value.trim(), expected: currentEx.broadcast, name: "Broadcast" },
+            { id: 'in-hosts', value: document.getElementById('in-hosts').value.trim(), expected: currentEx.hosts, name: "Totale Host" }
         ];
 
-        let wrongFields = [];
-        let missingFields = [];
         let correctCount = 0;
+        let resultsHtml = '';
 
-        // Validazione dei campi
+        // Validazione dei campi e colorazione degli input
         fields.forEach(f => {
-            if (f.value === "") {
-                missingFields.push(f.name);
-            } else if (f.value !== f.expected) {
-                wrongFields.push(f.name);
-            } else {
+            let inputEl = document.getElementById(f.id);
+            
+            if (f.value === f.expected) {
+                // Risposta corretta: verde
+                inputEl.style.borderColor = "green";
+                inputEl.style.color = "green";
                 correctCount++;
+                resultsHtml += `<li><strong style="color: green;">${f.name}:</strong> <span style="color: black;">Corretto</span></li>`;
+            } else {
+                // Risposta errata: rosso
+                inputEl.style.borderColor = "red";
+                inputEl.style.color = "red";
+                
+                // Spiegazione dell'errore (in nero)
+                let expl = "";
+                if (currentAttempt >= maxAttempts) {
+                    expl = `Sbagliato. La risposta corretta era <strong>${f.expected}</strong>.`;
+                } else if (f.value === "") {
+                    expl = `Campo lasciato in bianco.`;
+                } else {
+                    expl = `Valore errato.`;
+                }
+                
+                resultsHtml += `<li><strong style="color: red;">${f.name}:</strong> <span style="color: black;">${expl}</span></li>`;
             }
         });
 
         // Calcolo punteggio: proporzionale ai campi corretti (su 7 totali)
-        // Opzionale: applichiamo una lieve penalità per ogni tentativo oltre il primo (-5% a tentativo)
+        // Penalità opzionale del 5% per ogni tentativo oltre il primo
         let baseScore = (correctCount / fields.length) * 100;
         let penalty = (currentAttempt - 1) * 5;
         let finalScore = Math.max(0, baseScore - penalty);
@@ -463,24 +492,19 @@
         if (correctCount === fields.length) {
             // VITTORIA
             fb.className = "feedback success";
-            fb.innerHTML = `<strong>Ottimo lavoro!</strong><br>Hai modellato e calcolato la sottorete in modo impeccabile.<br><br><span class="score-highlight">Punteggio finale: ${finalScore.toFixed(1)}%</span>`;
+            fb.innerHTML = `<strong style="color: black;">Ottimo lavoro! Hai modellato e calcolato la sottorete in modo impeccabile.</strong><br><br>
+                            <ul>${resultsHtml}</ul><br>
+                            <span class="score-highlight">Punteggio finale: ${finalScore.toFixed(1)}%</span>`;
             document.getElementById('verify-btn').disabled = true;
         } else {
             // ERRORE O CAMPI MANCANTI
             if (currentAttempt < maxAttempts) {
                 // Tentativi ancora disponibili (NON mostrare le soluzioni)
-                let errorMsg = `<strong>Attenzione, ci sono errori nel tuo calcolo.</strong><br>`;
-                if (wrongFields.length > 0) {
-                    errorMsg += `<br>Hai inserito un valore errato nei seguenti campi: <ul><li>${wrongFields.join('</li><li>')}</li></ul>`;
-                }
-                if (missingFields.length > 0) {
-                    errorMsg += `<br>I seguenti campi sono stati lasciati in bianco: <ul><li>${missingFields.join('</li><li>')}</li></ul>`;
-                }
-                
-                errorMsg += `<br><em>Ti restano ${maxAttempts - currentAttempt} tentativi per correggere!</em>`;
-                
                 fb.className = "feedback error";
-                fb.innerHTML = errorMsg;
+                fb.innerHTML = `<span style="color: black;"><strong>Attenzione, ci sono errori nel tuo calcolo.</strong><br>
+                                Ecco il riepilogo delle tue risposte:<br>
+                                <ul>${resultsHtml}</ul><br>
+                                <em>Ti restano ${maxAttempts - currentAttempt} tentativi per correggere!</em></span>`;
                 currentAttempt++;
                 
                 // Aggiorna a schermo il numero del prossimo tentativo
@@ -489,13 +513,11 @@
 
             } else {
                 // GAME OVER (Tentativi esauriti, MOSTRA le soluzioni)
-                let solutionsHtml = fields.map(f => `<li><strong>${f.name}:</strong> ${f.expected}</li>`).join('');
-                
                 fb.className = "feedback error";
-                fb.innerHTML = `<strong>Hai esaurito i ${maxAttempts} tentativi! Esercizio terminato.</strong><br><br>
-                                <span class="score-highlight">Il tuo punteggio finale è: ${finalScore.toFixed(1)}%</span><br><br>
-                                Ecco le risposte corrette che dovevi inserire:
-                                <ul>${solutionsHtml}</ul>`;
+                fb.innerHTML = `<span style="color: black;"><strong>Hai esaurito i ${maxAttempts} tentativi! Esercizio terminato.</strong><br><br>
+                                Riepilogo conclusivo con le soluzioni:<br>
+                                <ul>${resultsHtml}</ul><br>
+                                <span class="score-highlight">Il tuo punteggio finale è: ${finalScore.toFixed(1)}%</span></span>`;
                 
                 document.getElementById('verify-btn').disabled = true;
             }
