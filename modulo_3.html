@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modulo 3: Piani di Indirizzamento - Sistemi e Reti</title>
+    <style>
+        :root {
+            --wiki-bg: #f6f6f6;
+            --wiki-border: #a2a9b1;
+            --wiki-blue: #0645ad;
+            --wiki-blue-hover: #0b0080;
+            --layer-net: #fed9a6;
+            --success: #d5fdf4;
+            --error: #fde8e8;
+        }
+
+        body {
+            font-family: sans-serif;
+            background-color: var(--wiki-bg);
+            color: #202122;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            background: white;
+            padding: 30px;
+            border: 1px solid var(--wiki-border);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .top-nav {
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            background: #f8f9fa;
+            padding: 10px 15px;
+            border: 1px solid var(--wiki-border);
+            border-radius: 4px;
+        }
+
+        h1, h2, h3 {
+            font-family: "Linux Libertine", "Georgia", "Times", serif;
+            border-bottom: 1px solid var(--wiki-border);
+            padding-bottom: 5px;
+            font-weight: normal;
+        }
+
+        h1 { font-size: 2em; margin-top: 0; }
+        
+        a { color: var(--wiki-blue); text-decoration: none; }
+        a:hover { text-decoration: underline; color: var(--wiki-blue-hover); }
+
+        .layer-badge {
+            background-color: var(--layer-net);
+            padding: 5px 10px;
+            border: 1px solid #888;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .toc {
+            background: #f8f9fa;
+            border: 1px solid var(--wiki-border);
+            padding: 15px;
+            display: inline-block;
+            margin: 20px 0;
+            font-size: 0.95em;
+        }
+        .toc ul { list-style: none; padding-left: 20px; }
+        .toc > ul { padding-left: 0; }
+
+        table.wikitable {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.95em;
+        }
+        table.wikitable th, table.wikitable td {
+            border: 1px solid var(--wiki-border);
+            padding: 8px;
+            text-align: left;
+        }
+        table.wikitable th { background-color: #f2f2f2; }
+
+        .info-box {
+            background-color: #eaf3ff;
+            border-left: 5px solid var(--wiki-blue);
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        /* Tool Styles */
+        .tool-container {
+            background-color: #f8f9fa;
+            border: 1px solid var(--wiki-border);
+            padding: 25px;
+            border-radius: 5px;
+            margin-top: 30px;
+        }
+
+        .tool-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tool-header h3 { border: none; margin: 0; font-family: sans-serif; font-weight: bold; }
+
+        .btn {
+            background-color: var(--wiki-blue);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .btn:hover { background-color: var(--wiki-blue-hover); }
+        .btn-secondary { background-color: #6c757d; }
+        .btn-secondary:hover { background-color: #5a6268; }
+
+        .exercise-box {
+            background: white;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            text-align: center;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label { font-weight: bold; margin-bottom: 5px; font-size: 0.9em; }
+        .form-group input, .form-group select {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 1em;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            display: none;
+            font-weight: bold;
+        }
+        .feedback.success { background-color: var(--success); color: #006b54; display: block; border: 1px solid #006b54;}
+        .feedback.error { background-color: var(--error); color: #b30000; display: block; border: 1px solid #b30000; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="top-nav">
+        <a href="index.html">← Torna all'Indice del Corso</a> | 
+        <a href="modulo_2.html">Modulo 2: Livello Fisico</a> &gt; <strong>Modulo 3: Indirizzamento IP</strong>
+    </div>
+
+    <div class="layer-badge">Livello 3 OSI / Internet TCP/IP</div>
+    <h1>Modulo 3: Piani di Indirizzamento IP e Subnetting</h1>
+    
+    <p>Il protocollo IP fornisce l'indirizzo logico degli host di una rete TCP/IP[cite: 549]. A ciascun host viene assegnato un indirizzo univoco rispetto alla rete su cui sta lavorando[cite: 550]. Questo indirizzo permette ai router di inoltrare i pacchetti correttamente lungo le reti interconnesse.</p>
+
+    <div class="toc">
+        <b>Indice</b>
+        <ul>
+            <li><a href="#struttura">1. La Struttura degli Indirizzi IPv4</a></li>
+            <li><a href="#classi">2. Le Classi di Indirizzamento</a></li>
+            <li><a href="#riservati">3. Indirizzi Riservati, Pubblici e Privati</a></li>
+            <li><a href="#subnetting">4. Pianificazione e Subnetting</a></li>
+            <li><a href="#esercizi">5. Tool Interattivo: Esercizi Automatici</a></li>
+        </ul>
+    </div>
+
+    <h2 id="struttura">1. La Struttura degli Indirizzi IPv4</h2>
+    <p>Gli indirizzi IPv4 sono composti da <strong>32 bit</strong> suddivisi in 4 byte (o ottetti)[cite: 562]. Per facilitarne la lettura, vengono solitamente espressi nella notazione decimale puntata, costituita da 4 numeri decimali compresi tra 0 e 255, separati da un punto[cite: 563].</p>
+
+    
+    <p>Logicamente, un indirizzo IP è diviso in due parti fondamentali:</p>
+    <ul>
+        <li><strong>NetID (Network ID):</strong> È la porzione che identifica la rete in cui si trova l'host[cite: 598].</li>
+        <li><strong>HostID:</strong> È la porzione che identifica il singolo host all'interno di quella specifica rete[cite: 609].</li>
+    </ul>
+
+    <hr>
+
+    <h2 id="classi">2. Le Classi di Indirizzamento (Classful)</h2>
+    <p>In base al valore dei bit più significativi (i primi bit da sinistra), gli indirizzi IP storicamente sono stati suddivisi in 5 classi (A, B, C, D, E), sebbene solo le prime tre possano essere utilizzate per assegnare indirizzi ai dispositivi host[cite: 612].</p>
+
+    
+    <table class="wikitable">
+        <tr>
+            <th>Classe</th>
+            <th>Bit Iniziali</th>
+            <th>Rete / Host</th>
+            <th>Intervallo Indirizzi</th>
+            <th>Subnet Mask di Default</th>
+        </tr>
+        <tr>
+            <td><strong>Classe A</strong></td>
+            <td>0</td>
+            <td>7 bit rete, 24 bit host</td>
+            <td>0.0.0.0 a 127.255.255.255 [cite: 642, 644]</td>
+            <td>255.0.0.0 [cite: 541]</td>
+        </tr>
+        <tr>
+            <td><strong>Classe B</strong></td>
+            <td>10</td>
+            <td>14 bit rete, 16 bit host</td>
+            <td>128.0.0.0 a 191.255.255.255 [cite: 651, 653]</td>
+            <td>255.255.0.0 [cite: 541]</td>
+        </tr>
+        <tr>
+            <td><strong>Classe C</strong></td>
+            <td>110</td>
+            <td>21 bit rete, 8 bit host</td>
+            <td>192.0.0.0 a 223.255.255.255 [cite: 666, 668]</td>
+            <td>255.255.255.0 [cite: 541]</td>
+        </tr>
+        <tr>
+            <td><strong>Classe D</strong></td>
+            <td>1110</td>
+            <td>Multicast</td>
+            <td>224.0.0.0 a 239.255.255.255 [cite: 676]</td>
+            <td>Non applicabile</td>
+        </tr>
+        <tr>
+            <td><strong>Classe E</strong></td>
+            <td>1111</td>
+            <td>Sperimentale</td>
+            <td>240.0.0.0 a 255.255.255.255 [cite: 686]</td>
+            <td>Non applicabile</td>
+        </tr>
+    </table>
+
+    <hr>
+
+    <h2 id="riservati">3. Indirizzi Riservati, Pubblici e Privati</h2>
+    
+    <h3>Indirizzi non assegnabili a un host</h3>
+    <p>All'interno di qualsiasi rete, ci sono due indirizzi speciali che non possono essere configurati su un PC o Router:</p>
+    <ul>
+        <li><strong>Indirizzo di Rete:</strong> Si ottiene ponendo tutti i bit dell'HostID a "0" (es. 192.168.1.0)[cite: 726].</li>
+        <li><strong>Indirizzo di Broadcast:</strong> Si ottiene ponendo tutti i bit dell'HostID a "1" (es. 192.168.1.255). Serve per mandare pacchetti a tutti gli host della rete[cite: 739].</li>
+    </ul>
+
+    <h3>Indirizzi per test e configurazioni</h3>
+    <ul>
+        <li><strong>Loopback (127.0.0.1):</strong> Serve per verificare se l'host è correttamente configurato rispetto allo stack TCP/IP, rappresentando il "localhost"[cite: 749].</li>
+        <li><strong>APIPA (169.254.x.x):</strong> Riservato per l'autoconfigurazione quando un host non riesce a raggiungere il server DHCP[cite: 755].</li>
+    </ul>
+
+    <h3>Indirizzi Privati (RFC 1918)</h3>
+    <p>Gli indirizzi pubblici sono univoci su Internet. Per evitare l'esaurimento degli IPv4, sono stati definiti dei blocchi di indirizzi <em>privati</em>, usabili liberamente nelle reti locali ma non instradabili su Internet[cite: 762]:</p>
+    <ul>
+        <li>Classe A: da <strong>10.0.0.0</strong> a <strong>10.255.255.255</strong> [cite: 763]</li>
+        <li>Classe B: da <strong>172.16.0.0</strong> a <strong>172.31.255.255</strong> [cite: 764]</li>
+        <li>Classe C: da <strong>192.168.0.0</strong> a <strong>192.168.255.255</strong> [cite: 772]</li>
+    </ul>
+
+    <hr>
+
+    <h2 id="subnetting">4. Pianificazione e Subnetting</h2>
+    <p>Il subnetting consiste nel dividere la rete principale in sottoreti logiche per ottimizzare il traffico e aumentare la sicurezza[cite: 821]. Si realizza "sacrificando" alcuni dei bit dedicati agli host per definire un <strong>SubnetID</strong>[cite: 823].</p>
+
+    
+    <p>Per indicare ai dispositivi di rete quanti bit appartengono alla Rete/Sottorete e quanti all'Host, si utilizza la <strong>Subnet Mask</strong>. Questa è una stringa di 32 bit dove i bit posti a "1" rappresentano la parte di rete, mentre i bit a "0" rappresentano l'HostID[cite: 533, 534].</p>
+
+    <h2 id="esercizi">5. Tool Interattivo: Esercizi Automatici</h2>
+    <p>Mettiti alla prova! Questo strumento genera indirizzi casuali e ti chiede di calcolarne i parametri fondamentali, esattamente come visto negli esempi del libro.</p>
+
+    <div class="tool-container">
+        <div class="tool-header">
+            <h3>Correttore Subnetting e Indirizzamento</h3>
+            <button class="btn btn-secondary" onclick="generateExercise()">Genera Nuovo Esercizio</button>
+        </div>
+
+        <div class="exercise-box">
+            Dato l'indirizzo IP: <strong id="ex-ip" style="font-size: 1.2em; color: var(--wiki-blue);">---.---.---.---</strong><br>
+            Con Subnet Mask: <strong id="ex-mask">---.---.---.---</strong>
+        </div>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="in-classe">1. A quale Classe appartiene? (A, B, C)</label>
+                <select id="in-classe">
+                    <option value="">Seleziona...</option>
+                    <option value="A">Classe A</option>
+                    <option value="B">Classe B</option>
+                    <option value="C">Classe C</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="in-rete">2. Calcola l'indirizzo di Rete</label>
+                <input type="text" id="in-rete" placeholder="Es. 192.168.1.0">
+            </div>
+
+            <div class="form-group">
+                <label for="in-broadcast">3. Calcola l'indirizzo di Broadcast</label>
+                <input type="text" id="in-broadcast" placeholder="Es. 192.168.1.255">
+            </div>
+
+            <div class="form-group">
+                <label for="in-valido">4. Questo IP è assegnabile a un PC?</label>
+                <select id="in-valido">
+                    <option value="">Seleziona...</option>
+                    <option value="Si">Sì (È un host valido)</option>
+                    <option value="No">No (È Rete o Broadcast)</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 25px;">
+            <button class="btn" onclick="verifyExercise()" style="width: 200px; padding: 12px;">Verifica Risposte</button>
+        </div>
+
+        <div id="feedback" class="feedback"></div>
+    </div>
+
+</div>
+
+<script>
+    let currentEx = null;
+
+    // Helper per conversioni IP bit a bit
+    function ip2long(ip) {
+        return ip.split('.').reduce((acc, octet) => (acc << 8) + parseInt(octet, 10), 0) >>> 0;
+    }
+    
+    function long2ip(long) {
+        return [ (long >>> 24) & 255, (long >>> 16) & 255, (long >>> 8) & 255, long & 255 ].join('.');
+    }
+
+    function generateExercise() {
+        // Pulisce l'UI
+        document.getElementById('in-classe').value = "";
+        document.getElementById('in-rete').value = "";
+        document.getElementById('in-broadcast').value = "";
+        document.getElementById('in-valido').value = "";
+        document.getElementById('feedback').className = "feedback";
+        document.getElementById('feedback').style.display = "none";
+
+        // Generazione logica di un IP di classe A, B o C
+        let firstOctet = Math.floor(Math.random() * 223) + 1;
+        if(firstOctet === 127) firstOctet = 128; // Evita loopback
+        let o2 = Math.floor(Math.random() * 256);
+        let o3 = Math.floor(Math.random() * 256);
+        let o4 = Math.floor(Math.random() * 256);
+        
+        let classe = "A";
+        let maskStr = "255.0.0.0";
+        if (firstOctet >= 128 && firstOctet <= 191) { 
+            classe = "B"; maskStr = "255.255.0.0"; 
+        } else if (firstOctet >= 192 && firstOctet <= 223) { 
+            classe = "C"; maskStr = "255.255.255.0"; 
+        }
+
+        let ipStr = `${firstOctet}.${o2}.${o3}.${o4}`;
+        let ipL = ip2long(ipStr);
+        let maskL = ip2long(maskStr);
+        
+        // Calcolo matematico Rete e Broadcast
+        let netL = ipL & maskL;
+        let bcastL = netL | (~maskL >>> 0);
+        
+        let rete = long2ip(netL);
+        let broadcast = long2ip(bcastL);
+        
+        // Introduciamo casi limite per renderlo interessante (25% probabilità di essere Rete, 25% Broadcast)
+        let randType = Math.random();
+        let valido = "Si";
+        if (randType < 0.25) {
+            ipStr = rete;
+            valido = "No";
+        } else if (randType < 0.50) {
+            ipStr = broadcast;
+            valido = "No";
+        }
+
+        currentEx = {
+            ip: ipStr,
+            mask: maskStr,
+            classe: classe,
+            rete: rete,
+            broadcast: broadcast,
+            valido: valido
+        };
+
+        // Aggiorna l'UI
+        document.getElementById('ex-ip').innerText = currentEx.ip;
+        document.getElementById('ex-mask').innerText = currentEx.mask;
+    }
+
+    function verifyExercise() {
+        if(!currentEx) {
+            alert("Genera prima un esercizio!");
+            return;
+        }
+
+        let uClass = document.getElementById('in-classe').value;
+        let uRete = document.getElementById('in-rete').value.trim();
+        let uBcast = document.getElementById('in-broadcast').value.trim();
+        let uValido = document.getElementById('in-valido').value;
+
+        let errors = [];
+
+        if (uClass !== currentEx.classe) errors.push(`La classe corretta era <strong>${currentEx.classe}</strong>.`);
+        if (uRete !== currentEx.rete) errors.push(`L'indirizzo di rete corretto è <strong>${currentEx.rete}</strong>.`);
+        if (uBcast !== currentEx.broadcast) errors.push(`Il broadcast corretto è <strong>${currentEx.broadcast}</strong>.`);
+        if (uValido !== currentEx.valido) {
+            let motivazione = currentEx.valido === "No" ? "perché si tratta di un indirizzo di rete o broadcast." : "perché si trova nell'intervallo degli host utili.";
+            errors.push(`Assegnabilità errata (${currentEx.valido}) ${motivazione}`);
+        }
+
+        let fb = document.getElementById('feedback');
+        fb.style.display = "block";
+
+        if (errors.length === 0) {
+            fb.className = "feedback success";
+            fb.innerHTML = "🎉 <strong>Bravissimo!</strong> Tutti i calcoli sono corretti.";
+        } else {
+            fb.className = "feedback error";
+            fb.innerHTML = "<strong>Attenzione, ci sono degli errori:</strong><br><ul>" + errors.map(e => `<li>${e}</li>`).join('') + "</ul>";
+        }
+    }
+
+    // Inizializza il primo esercizio al caricamento della pagina
+    window.onload = generateExercise;
+</script>
+
+</body>
+</html>
