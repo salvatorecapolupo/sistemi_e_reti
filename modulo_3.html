@@ -86,7 +86,6 @@
         }
         table.wikitable th { background-color: #f2f2f2; }
 
-        /* Advanced Tool Styles */
         .tool-container {
             background-color: #f8f9fa;
             border: 1px solid var(--wiki-border);
@@ -149,12 +148,42 @@
             text-align: center;
         }
 
-        .ip-display {
+        /* 4) IP/CIDR editabile inline */
+        .ip-edit-row {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .ip-edit-row input {
             font-family: monospace;
-            font-size: 1.5em;
-            color: var(--wiki-blue);
+            font-size: 1em;
             font-weight: bold;
-            letter-spacing: 2px;
+            color: var(--wiki-blue);
+            border: none;
+            border-bottom: 2px solid var(--wiki-blue);
+            background: transparent;
+            text-align: center;
+            outline: none;
+            padding: 2px 4px;
+        }
+
+        #in-ip-manual   { width: 145px; letter-spacing: 1px; }
+        #in-cidr-manual { width: 36px; }
+
+        .ip-edit-row .slash {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: var(--wiki-blue);
+        }
+
+        #ip-edit-error {
+            font-size: 0.72em;
+            color: #b30000;
+            margin-top: 5px;
+            min-height: 1em;
+            display: block;
         }
 
         .form-grid {
@@ -194,10 +223,39 @@
             color: black;
         }
         .feedback.success { background-color: var(--success); display: block; border: 1px solid var(--success-border);}
-        .feedback.error { background-color: var(--error); display: block; border: 1px solid var(--error-border); }
+        .feedback.error   { background-color: var(--error);   display: block; border: 1px solid var(--error-border); }
         .feedback ul { margin: 10px 0 0 0; padding-left: 20px; }
-        
+
         .score-highlight { font-size: 1.2em; font-weight: bold; color: black; }
+
+        /* 3) Typewriter */
+        .subnet-typewriter {
+            margin-top: 25px;
+            background: #fff;
+            border: 1px solid var(--wiki-border);
+            border-radius: 6px;
+            padding: 18px 20px;
+            font-family: "Courier New", monospace;
+            font-size: 0.95em;
+            color: #202122;
+            min-height: 3em;
+            line-height: 1.9;
+            display: none;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .tw-cursor {
+            display: inline-block;
+            width: 2px;
+            background: #202122;
+            animation: blink 0.75s step-end infinite;
+            vertical-align: text-bottom;
+            height: 1.1em;
+            margin-left: 1px;
+        }
+
+        @keyframes blink { 50% { opacity: 0; } }
     </style>
 </head>
 <body>
@@ -291,9 +349,16 @@
             </div>
         </div>
 
+        <!-- 4) IP/CIDR editabile -->
         <div class="exercise-box">
             Analizza il seguente indirizzo IP e prefisso CIDR:<br>
-            <div class="ip-display" id="ex-ip-cidr">---.---.---.--- /--</div>
+            <div class="ip-edit-row">
+                <input type="text" id="in-ip-manual" maxlength="15" placeholder="0.0.0.0" autocomplete="off" spellcheck="false">
+                <span class="slash">/</span>
+                <input type="text" id="in-cidr-manual" maxlength="2" placeholder="24" autocomplete="off" spellcheck="false">
+                <button class="btn" style="padding:4px 10px;font-size:0.82em;" onclick="applyManualInput()">Applica</button>
+            </div>
+            <span id="ip-edit-error"></span>
         </div>
 
         <div class="form-grid">
@@ -308,22 +373,22 @@
             </div>
 
             <div class="form-group">
-                <label for="in-mask">2. Subnet Mask (Decimale Puntato)</label>
+                <label for="in-mask">2. Subnet Mask</label>
                 <input type="text" id="in-mask" placeholder="es. 255.255.255.224">
             </div>
 
             <div class="form-group">
-                <label for="in-net">3. Indirizzo di Rete</label>
+                <label for="in-net">3. Primo Indirizzo di Rete</label>
                 <input type="text" id="in-net" placeholder="es. 192.168.1.32">
             </div>
 
             <div class="form-group">
-                <label for="in-first">4. Primo IP Assegnabile (First Host)</label>
+                <label for="in-first">4. Primo IP Assegnabile</label>
                 <input type="text" id="in-first" placeholder="es. 192.168.1.33">
             </div>
 
             <div class="form-group">
-                <label for="in-last">5. Ultimo IP Assegnabile (Last Host)</label>
+                <label for="in-last">5. Ultimo IP Assegnabile</label>
                 <input type="text" id="in-last" placeholder="es. 192.168.1.62">
             </div>
 
@@ -343,188 +408,264 @@
         </div>
 
         <div id="feedback" class="feedback"></div>
+
+        <!-- 3) Typewriter output sottoreti -->
+        <div class="subnet-typewriter" id="subnet-typewriter"></div>
     </div>
 
 </div>
 
 <script>
-    let currentEx = null;
+    let currentEx    = null;
     let currentAttempt = 1;
-    const maxAttempts = 3;
+    const maxAttempts  = 3;
+    let twTimer = null;
 
-    // Helper matematici per IP
+    // ── helpers ──────────────────────────────────────────────────────────────
     function ip2long(ip) {
-        return ip.split('.').reduce((acc, octet) => (acc << 8) + parseInt(octet, 10), 0) >>> 0;
-    }
-    
-    function long2ip(long) {
-        return [ (long >>> 24) & 255, (long >>> 16) & 255, (long >>> 8) & 255, long & 255 ].join('.');
+        return ip.split('.').reduce((acc, o) => (acc << 8) + parseInt(o, 10), 0) >>> 0;
     }
 
-    function generateComplexExercise() {
-        // Reset interfaccia e campi form
-        document.querySelectorAll('.form-group input, .form-group select').forEach(input => {
-            input.value = "";
-            input.style.borderColor = "#ccc";
-            input.style.color = "black";
-        });
-        
-        document.getElementById('feedback').className = "feedback";
-        document.getElementById('feedback').style.display = "none";
-        document.getElementById('verify-btn').disabled = false;
-        
-        currentAttempt = 1;
-        updateStatusDisplay(0.0);
+    function long2ip(l) {
+        return [(l >>> 24) & 255, (l >>> 16) & 255, (l >>> 8) & 255, l & 255].join('.');
+    }
 
-        // Generazione IP Casuale valido (Evitando 127.x.x.x e Multicast/Class E)
-        let o1 = Math.floor(Math.random() * 223) + 1;
-        if(o1 === 127) o1 = 128; 
-        let o2 = Math.floor(Math.random() * 256);
-        let o3 = Math.floor(Math.random() * 256);
-        let o4 = Math.floor(Math.random() * 256);
-        
-        let ipStr = `${o1}.${o2}.${o3}.${o4}`;
-        
-        // Calcolo Classe Storica
-        let ipClass = "Sconosciuta";
-        if (o1 >= 1 && o1 <= 126) ipClass = "A";
-        else if (o1 >= 128 && o1 <= 191) ipClass = "B";
-        else if (o1 >= 192 && o1 <= 223) ipClass = "C";
+    function isValidIP(ip) {
+        return /^(\d{1,3}\.){3}\d{1,3}$/.test(ip) &&
+               ip.split('.').every(o => +o >= 0 && +o <= 255);
+    }
 
-        // Genera CIDR casuale tra /8 e /30 per garantire varietà di subnetting
-        let cidr = Math.floor(Math.random() * 23) + 8; // 8 to 30
+    // ── calcola struttura esercizio da ip+cidr ────────────────────────────────
+    function computeExercise(ipStr, cidr) {
+        const o1 = parseInt(ipStr.split('.')[0]);
+        let ipClass = 'Sconosciuta';
+        if      (o1 >= 1   && o1 <= 126) ipClass = 'A';
+        else if (o1 >= 128 && o1 <= 191) ipClass = 'B';
+        else if (o1 >= 192 && o1 <= 223) ipClass = 'C';
 
-        // Calcoli Binari
-        let ipL = ip2long(ipStr);
-        let maskL = ~((1 << (32 - cidr)) - 1) >>> 0;
-        
-        let netL = (ipL & maskL) >>> 0;
-        let bcastL = (netL | (~maskL)) >>> 0;
-        
-        let firstHostL = netL + 1;
-        let lastHostL = bcastL - 1;
-        
-        let usableHosts = (cidr >= 31) ? 0 : Math.pow(2, 32 - cidr) - 2;
-        if(usableHosts < 0) usableHosts = 0;
+        const ipL    = ip2long(ipStr);
+        const maskL  = (~((1 << (32 - cidr)) - 1)) >>> 0;
+        const netL   = (ipL & maskL) >>> 0;
+        const bcastL = (netL | ~maskL) >>> 0;
+        const hosts  = Math.max(0, Math.pow(2, 32 - cidr) - 2);
 
-        currentEx = {
-            ip: ipStr,
-            cidr: cidr,
+        return {
+            ip: ipStr, cidr,
             storicClass: ipClass,
-            mask: long2ip(maskL),
-            network: long2ip(netL),
-            first: long2ip(firstHostL),
-            last: long2ip(lastHostL),
+            mask:      long2ip(maskL),
+            network:   long2ip(netL),
+            first:     long2ip((netL  + 1) >>> 0),
+            last:      long2ip((bcastL - 1) >>> 0),
             broadcast: long2ip(bcastL),
-            hosts: usableHosts.toString()
+            hosts:     hosts.toString()
         };
-
-        // Mostra a schermo l'esercizio
-        document.getElementById('ex-ip-cidr').innerText = `${currentEx.ip} /${currentEx.cidr}`;
     }
 
-    function updateStatusDisplay(score) {
-        document.getElementById('score-display').innerText = `Punteggio: ${score.toFixed(1)}%`;
-        let visualAttempt = currentAttempt > maxAttempts ? maxAttempts : currentAttempt;
-        document.getElementById('attempt-display').innerText = `Tentativo: ${visualAttempt}/${maxAttempts}`;
-    }
+    // ── 4) applica input manuale con validazione ──────────────────────────────
+    function applyManualInput() {
+        const ipRaw   = document.getElementById('in-ip-manual').value.trim();
+        const cidrRaw = document.getElementById('in-cidr-manual').value.trim();
+        const errEl   = document.getElementById('ip-edit-error');
 
-    function verifyComplexExercise() {
-        if(!currentEx) {
-            alert("Genera prima un esercizio!");
+        if (!isValidIP(ipRaw)) {
+            errEl.textContent = 'Indirizzo IP non valido.';
+            return;
+        }
+        const cidr = parseInt(cidrRaw);
+        if (isNaN(cidr) || cidr < 8 || cidr > 30) {
+            errEl.textContent = 'Il prefisso CIDR deve essere compreso tra /8 e /30.';
+            return;
+        }
+        const o1 = parseInt(ipRaw.split('.')[0]);
+        if (o1 === 0 || o1 === 127 || o1 > 223) {
+            errEl.textContent = 'Usare un IP di Classe A, B o C (primo ottetto: 1–126 oppure 128–223).';
             return;
         }
 
-        // Definizione dei campi da controllare
+        errEl.textContent = '';
+        resetForm();
+        currentEx      = computeExercise(ipRaw, cidr);
+        currentAttempt = 1;
+        updateStatusDisplay(0.0);
+        stopTW();
+        document.getElementById('subnet-typewriter').style.display = 'none';
+    }
+
+    // ── genera esercizio casuale ──────────────────────────────────────────────
+    function generateComplexExercise() {
+        resetForm();
+        stopTW();
+        document.getElementById('subnet-typewriter').style.display = 'none';
+        document.getElementById('ip-edit-error').textContent = '';
+        currentAttempt = 1;
+        updateStatusDisplay(0.0);
+
+        let o1 = Math.floor(Math.random() * 223) + 1;
+        if (o1 === 127) o1 = 128;
+        const ipStr = `${o1}.${Math.floor(Math.random()*256)}.${Math.floor(Math.random()*256)}.${Math.floor(Math.random()*256)}`;
+        const cidr  = Math.floor(Math.random() * 23) + 8;
+
+        currentEx = computeExercise(ipStr, cidr);
+        document.getElementById('in-ip-manual').value   = currentEx.ip;
+        document.getElementById('in-cidr-manual').value = currentEx.cidr;
+    }
+
+    function resetForm() {
+        document.querySelectorAll('.form-group input, .form-group select').forEach(el => {
+            el.value = '';
+            el.style.borderColor = '#ccc';
+            el.style.color = 'black';
+        });
+        document.getElementById('feedback').className    = 'feedback';
+        document.getElementById('feedback').style.display = 'none';
+        document.getElementById('verify-btn').disabled   = false;
+    }
+
+    function updateStatusDisplay(score) {
+        document.getElementById('score-display').innerText   = `Punteggio: ${score.toFixed(1)}%`;
+        document.getElementById('attempt-display').innerText = `Tentativo: ${Math.min(currentAttempt, maxAttempts)}/${maxAttempts}`;
+    }
+
+    // ── 3) costruisce testo sottoreti ─────────────────────────────────────────
+    function buildSubnetText(ex) {
+        const cidr   = ex.cidr;
+        const size   = Math.pow(2, 32 - cidr);
+        const usable = Math.max(0, size - 2);
+        const netL   = ip2long(ex.network);
+
+        const maxShow   = 16;
+        const totalNets = Math.round(Math.pow(2, 32) / size);
+        const showCount = Math.min(maxShow, totalNets);
+
+        let txt = `La rete ${ex.ip}/${cidr} (maschera ${ex.mask}) è suddivisa in sottoreti `;
+        txt += usable > 0
+            ? `con ${usable} host assegnabili ciascuna:\n\n`
+            : `senza host assegnabili (prefisso troppo lungo):\n\n`;
+
+        for (let i = 0; i < showCount; i++) {
+            const sNetL   = (netL + i * size) >>> 0;
+            const sBcastL = (sNetL + size - 1) >>> 0;
+            const sNet    = long2ip(sNetL);
+            const sBcast  = long2ip(sBcastL);
+
+            if (usable > 0) {
+                const sFirst = long2ip((sNetL  + 1) >>> 0);
+                const sLast  = long2ip((sBcastL - 1) >>> 0);
+                txt += `  Sottorete ${i+1}: ${sNet}  —  host: ${sFirst} → ${sLast}  —  broadcast: ${sBcast}\n`;
+            } else {
+                txt += `  Sottorete ${i+1}: ${sNet}  —  broadcast: ${sBcast}\n`;
+            }
+
+            if (sBcastL >= 0xFFFFFFFF) break;
+        }
+
+        if (totalNets > maxShow) {
+            txt += `\n  … (visualizzate le prime ${maxShow} su ${totalNets} totali)`;
+        }
+
+        return txt;
+    }
+
+    // ── typewriter ────────────────────────────────────────────────────────────
+    let twText = '', twPos = 0, twEl = null;
+
+    function stopTW() {
+        if (twTimer) { clearTimeout(twTimer); twTimer = null; }
+    }
+
+    function startTW(text) {
+        stopTW();
+        twText = text; twPos = 0;
+        twEl   = document.getElementById('subnet-typewriter');
+        twEl.style.display = 'block';
+        // usiamo un div interno per il testo + cursore separato
+        twEl.innerHTML = '';
+        const pre    = document.createElement('span');
+        pre.id       = 'tw-text';
+        const cursor = document.createElement('span');
+        cursor.className = 'tw-cursor';
+        cursor.textContent = '\u200b'; // zero-width space per tenere l'altezza
+        twEl.appendChild(pre);
+        twEl.appendChild(cursor);
+        typeNext();
+    }
+
+    function typeNext() {
+        if (twPos >= twText.length) {
+            const cursor = twEl.querySelector('.tw-cursor');
+            if (cursor) cursor.remove();
+            return;
+        }
+        const ch = twText[twPos++];
+        document.getElementById('tw-text').textContent += ch;
+        const delay = (ch === '\n') ? 90 : (Math.random() * 28 + 16);
+        twTimer = setTimeout(typeNext, delay);
+    }
+
+    // ── verifica ──────────────────────────────────────────────────────────────
+    function verifyComplexExercise() {
+        if (!currentEx) { alert('Genera prima un esercizio!'); return; }
+
         const fields = [
-            { id: 'in-class', value: document.getElementById('in-class').value, expected: currentEx.storicClass, name: "Classe" },
-            { id: 'in-mask', value: document.getElementById('in-mask').value.trim(), expected: currentEx.mask, name: "Subnet Mask" },
-            { id: 'in-net', value: document.getElementById('in-net').value.trim(), expected: currentEx.network, name: "Indirizzo di Rete" },
-            { id: 'in-first', value: document.getElementById('in-first').value.trim(), expected: currentEx.first, name: "Primo IP" },
-            { id: 'in-last', value: document.getElementById('in-last').value.trim(), expected: currentEx.last, name: "Ultimo IP" },
-            { id: 'in-bcast', value: document.getElementById('in-bcast').value.trim(), expected: currentEx.broadcast, name: "Broadcast" },
-            { id: 'in-hosts', value: document.getElementById('in-hosts').value.trim(), expected: currentEx.hosts, name: "Totale Host" }
+            { id:'in-class', value: document.getElementById('in-class').value,         expected: currentEx.storicClass, name:'Classe' },
+            { id:'in-mask',  value: document.getElementById('in-mask').value.trim(),   expected: currentEx.mask,        name:'Subnet Mask' },
+            { id:'in-net',   value: document.getElementById('in-net').value.trim(),    expected: currentEx.network,     name:'Primo Indirizzo di Rete' },
+            { id:'in-first', value: document.getElementById('in-first').value.trim(),  expected: currentEx.first,       name:'Primo IP Assegnabile' },
+            { id:'in-last',  value: document.getElementById('in-last').value.trim(),   expected: currentEx.last,        name:'Ultimo IP Assegnabile' },
+            { id:'in-bcast', value: document.getElementById('in-bcast').value.trim(),  expected: currentEx.broadcast,   name:'Broadcast' },
+            { id:'in-hosts', value: document.getElementById('in-hosts').value.trim(),  expected: currentEx.hosts,       name:'Totale Host' }
         ];
 
-        let correctCount = 0;
-        let resultsHtml = '';
+        let correctCount = 0, resultsHtml = '';
 
-        // Validazione dei campi e colorazione degli input
         fields.forEach(f => {
-            let inputEl = document.getElementById(f.id);
-            
+            const el = document.getElementById(f.id);
             if (f.value === f.expected) {
-                // Risposta corretta: verde
-                inputEl.style.borderColor = "green";
-                inputEl.style.color = "green";
+                el.style.borderColor = 'green'; el.style.color = 'green';
                 correctCount++;
-                resultsHtml += `<li><strong style="color: green;">${f.name}:</strong> <span style="color: black;">Corretto</span></li>`;
+                resultsHtml += `<li><strong style="color:green;">${f.name}:</strong> <span style="color:black;">Corretto</span></li>`;
             } else {
-                // Risposta errata: rosso
-                inputEl.style.borderColor = "red";
-                inputEl.style.color = "red";
-                
-                // Spiegazione dell'errore (in nero)
-                let expl = "";
-                if (currentAttempt >= maxAttempts) {
-                    expl = `Sbagliato. La risposta corretta era <strong>${f.expected}</strong>.`;
-                } else if (f.value === "") {
-                    expl = `Campo lasciato in bianco.`;
-                } else {
-                    expl = `Valore errato.`;
-                }
-                
-                resultsHtml += `<li><strong style="color: red;">${f.name}:</strong> <span style="color: black;">${expl}</span></li>`;
+                el.style.borderColor = 'red'; el.style.color = 'red';
+                let expl = (currentAttempt >= maxAttempts)
+                    ? `Sbagliato. La risposta corretta era <strong>${f.expected}</strong>.`
+                    : (f.value === '' ? 'Campo lasciato in bianco.' : 'Valore errato.');
+                resultsHtml += `<li><strong style="color:red;">${f.name}:</strong> <span style="color:black;">${expl}</span></li>`;
             }
         });
 
-        // Calcolo punteggio: proporzionale ai campi corretti (su 7 totali)
-        // Penalità opzionale del 5% per ogni tentativo oltre il primo
-        let baseScore = (correctCount / fields.length) * 100;
-        let penalty = (currentAttempt - 1) * 5;
-        let finalScore = Math.max(0, baseScore - penalty);
-
+        const finalScore = Math.max(0, (correctCount / fields.length) * 100 - (currentAttempt - 1) * 5);
         updateStatusDisplay(finalScore);
 
-        let fb = document.getElementById('feedback');
-        fb.style.display = "block";
+        const fb = document.getElementById('feedback');
+        fb.style.display = 'block';
 
         if (correctCount === fields.length) {
-            // VITTORIA
-            fb.className = "feedback success";
-            fb.innerHTML = `<strong style="color: black;">Ottimo lavoro! Hai modellato e calcolato la sottorete in modo impeccabile.</strong><br><br>
+            fb.className = 'feedback success';
+            fb.innerHTML = `<strong style="color:black;">Ottimo lavoro! Hai modellato e calcolato la sottorete in modo impeccabile.</strong><br><br>
                             <ul>${resultsHtml}</ul><br>
                             <span class="score-highlight">Punteggio finale: ${finalScore.toFixed(1)}%</span>`;
             document.getElementById('verify-btn').disabled = true;
+            startTW(buildSubnetText(currentEx));
+        } else if (currentAttempt < maxAttempts) {
+            fb.className = 'feedback error';
+            fb.innerHTML = `<span style="color:black;"><strong>Attenzione, ci sono errori nel tuo calcolo.</strong><br>
+                            Ecco il riepilogo delle tue risposte:<br>
+                            <ul>${resultsHtml}</ul><br>
+                            <em>Ti restano ${maxAttempts - currentAttempt} tentativi per correggere!</em></span>`;
+            currentAttempt++;
+            document.getElementById('attempt-display').innerText =
+                `Tentativo: ${Math.min(currentAttempt, maxAttempts)}/${maxAttempts}`;
         } else {
-            // ERRORE O CAMPI MANCANTI
-            if (currentAttempt < maxAttempts) {
-                // Tentativi ancora disponibili (NON mostrare le soluzioni)
-                fb.className = "feedback error";
-                fb.innerHTML = `<span style="color: black;"><strong>Attenzione, ci sono errori nel tuo calcolo.</strong><br>
-                                Ecco il riepilogo delle tue risposte:<br>
-                                <ul>${resultsHtml}</ul><br>
-                                <em>Ti restano ${maxAttempts - currentAttempt} tentativi per correggere!</em></span>`;
-                currentAttempt++;
-                
-                // Aggiorna a schermo il numero del prossimo tentativo
-                let nextAttempt = currentAttempt > maxAttempts ? maxAttempts : currentAttempt;
-                document.getElementById('attempt-display').innerText = `Tentativo: ${nextAttempt}/${maxAttempts}`;
-
-            } else {
-                // GAME OVER (Tentativi esauriti, MOSTRA le soluzioni)
-                fb.className = "feedback error";
-                fb.innerHTML = `<span style="color: black;"><strong>Hai esaurito i ${maxAttempts} tentativi! Esercizio terminato.</strong><br><br>
-                                Riepilogo conclusivo con le soluzioni:<br>
-                                <ul>${resultsHtml}</ul><br>
-                                <span class="score-highlight">Il tuo punteggio finale è: ${finalScore.toFixed(1)}%</span></span>`;
-                
-                document.getElementById('verify-btn').disabled = true;
-            }
+            fb.className = 'feedback error';
+            fb.innerHTML = `<span style="color:black;"><strong>Hai esaurito i ${maxAttempts} tentativi! Esercizio terminato.</strong><br><br>
+                            Riepilogo conclusivo con le soluzioni:<br>
+                            <ul>${resultsHtml}</ul><br>
+                            <span class="score-highlight">Il tuo punteggio finale è: ${finalScore.toFixed(1)}%</span></span>`;
+            document.getElementById('verify-btn').disabled = true;
+            startTW(buildSubnetText(currentEx));
         }
     }
 
-    // Genera subito un esercizio all'avvio
     window.onload = generateComplexExercise;
 </script>
 
