@@ -495,22 +495,48 @@
 
     // ── genera esercizio casuale ──────────────────────────────────────────────
     function generateComplexExercise() {
-        resetForm();
-        stopTW();
-        document.getElementById('subnet-typewriter').style.display = 'none';
-        document.getElementById('ip-edit-error').textContent = '';
-        currentAttempt = 1;
-        updateStatusDisplay(0.0);
+    resetForm();
+    stopTW();
+    document.getElementById('subnet-typewriter').style.display = 'none';
+    document.getElementById('ip-edit-error').textContent = '';
+    currentAttempt = 1;
+    updateStatusDisplay(0.0);
 
-        let o1 = Math.floor(Math.random() * 223) + 1;
+    let o1, o2, o3, o4;
+
+    if (Math.random() < 0.5) {
+        const range = Math.floor(Math.random() * 3);
+        if (range === 0) {
+            o1 = 10;
+            o2 = Math.floor(Math.random() * 256);
+            o3 = Math.floor(Math.random() * 256);
+            o4 = Math.floor(Math.random() * 256);
+        } else if (range === 1) {
+            o1 = 172;
+            o2 = Math.floor(Math.random() * 16) + 16;
+            o3 = Math.floor(Math.random() * 256);
+            o4 = Math.floor(Math.random() * 256);
+        } else {
+            o1 = 192;
+            o2 = 168;
+            o3 = Math.floor(Math.random() * 256);
+            o4 = Math.floor(Math.random() * 256);
+        }
+    } else {
+        o1 = Math.floor(Math.random() * 223) + 1;
         if (o1 === 127) o1 = 128;
-        const ipStr = `${o1}.${Math.floor(Math.random()*256)}.${Math.floor(Math.random()*256)}.${Math.floor(Math.random()*256)}`;
-        const cidr  = Math.floor(Math.random() * 23) + 8;
-
-        currentEx = computeExercise(ipStr, cidr);
-        document.getElementById('in-ip-manual').value   = currentEx.ip;
-        document.getElementById('in-cidr-manual').value = currentEx.cidr;
+        o2 = Math.floor(Math.random() * 256);
+        o3 = Math.floor(Math.random() * 256);
+        o4 = Math.floor(Math.random() * 256);
     }
+
+    const ipStr = `${o1}.${o2}.${o3}.${o4}`;
+    const cidr  = Math.floor(Math.random() * 23) + 8;
+
+    currentEx = computeExercise(ipStr, cidr);
+    document.getElementById('in-ip-manual').value   = currentEx.ip;
+    document.getElementById('in-cidr-manual').value = currentEx.cidr;
+}
 
     function resetForm() {
         document.querySelectorAll('.form-group input, .form-group select').forEach(el => {
