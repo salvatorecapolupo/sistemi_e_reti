@@ -42,7 +42,7 @@
         }
 
         h1 { font-size: 2.2em; margin-top: 0; }
-        
+
         .intro-text {
             font-size: 1.1em;
             margin-bottom: 30px;
@@ -53,7 +53,8 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
-            margin-top: 20px;
+            margin-top: 10px;
+            margin-bottom: 30px;
         }
 
         .module-card {
@@ -119,21 +120,61 @@
             color: #54595d;
             flex-grow: 1;
         }
+
+        .toc {
+            background: #f8f9fa;
+            border: 1px solid var(--wiki-border);
+            padding: 15px 20px;
+            display: inline-block;
+            margin-bottom: 30px;
+            min-width: 250px;
+        }
+
+        .toc-title {
+            font-weight: bold;
+            font-size: 0.95em;
+            margin-bottom: 8px;
+        }
+
+        .toc ol {
+            margin: 0;
+            padding-left: 20px;
+            font-size: 0.9em;
+        }
+
+        .toc a {
+            color: var(--wiki-blue);
+            text-decoration: none;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>Enciclopedia di Sistemi e Reti</h1>
-    
+
     <p class="intro-text">
-        Benvenuto nel portale di ripasso per <strong>Sistemi e Reti</strong>. Questo indice raccoglie tutti i moduli del corso, partendo dalle basi teoriche della comunicazione fino ad arrivare ai protocolli applicativi e alla sicurezza informatica.
+        Benvenuto nel portale di ripasso per <strong>Sistemi e Reti</strong>. Questo indice raccoglie tutti i moduli del corso, dalle basi architetturali fino alla sicurezza informatica e ai protocolli applicativi. I contenuti sono orientati alla preparazione dell'<strong>Esame di Stato</strong>.
     </p>
 
-    <h2>Indice dei Moduli</h2>
+    <div class="toc">
+        <div class="toc-title">Indice</div>
+        <ol>
+            <li><a href="#fondamenti">Fondamenti</a></li>
+            <li><a href="#reti-locali">Reti locali e instradamento</a></li>
+            <li><a href="#servizi-sicurezza">Servizi, sicurezza e reti avanzate</a></li>
+        </ol>
+    </div>
+
+    <!-- ===================== FONDAMENTI ===================== -->
+    <h2 id="fondamenti">Fondamenti</h2>
 
     <div class="modules-grid">
-        
+
         <div class="module-card active">
             <span class="badge available">Completato</span>
             <h3>Modulo 1: Modelli di Rete</h3>
@@ -142,48 +183,169 @@
         </div>
 
         <div class="module-card">
+            <span class="badge pending">Da scrivere</span>
             <h3>Modulo 2: Livello Fisico</h3>
             <p class="module-desc">Segnali analogici e digitali, attenuazione, rumore e mezzi trasmissivi (Rame, Fibra Ottica, Wireless).</p>
-            <a href="modulo_2.html" class="module-link">Vai al Modulo →</a>
+            <span class="module-link" style="color: #888; cursor: not-allowed;">Non disponibile</span>
         </div>
 
-         <div class="module-card">
+        <div class="module-card active">
             <span class="badge available">Completato</span>
-            <h3>Modulo 3: Subnetting</h3>
+            <h3>Modulo 3: Subnetting IPv4</h3>
             <p class="module-desc">Maschere di sottorete (Subnet Mask), calcolo degli indirizzi di rete e di broadcast.</p>
             <a href="modulo_3.html" class="module-link">Vai al Modulo →</a>
         </div>
-        
+
         <div class="module-card">
             <span class="badge pending">Da scrivere</span>
-            <h3>Modulo 3: Livello Data Link</h3>
-            <p class="module-desc">Topologie di rete, tecnica di Framing, rilevamento e correzione degli errori (FCS, CRC), MAC Address.</p>
+            <h3>Modulo 4: Livello Data Link</h3>
+            <p class="module-desc">Topologie di rete, framing, rilevamento e correzione degli errori (FCS, CRC), indirizzi MAC.</p>
+            <span class="module-link" style="color: #888; cursor: not-allowed;">Non disponibile</span>
+        </div>
+
+    </div>
+
+    <!-- ===================== RETI LOCALI ===================== -->
+    <h2 id="reti-locali">Reti locali e instradamento</h2>
+
+    <div class="modules-grid">
+
+        <div class="module-card">
+            <span class="badge pending">Da scrivere</span>
+            <h3>Modulo 5: Ethernet e Switching</h3>
+            <p class="module-desc">Standard IEEE 802.3, domini di collisione e broadcast, funzionamento degli switch, protocollo ARP e tabelle MAC.</p>
             <span class="module-link" style="color: #888; cursor: not-allowed;">Non disponibile</span>
         </div>
 
         <div class="module-card">
             <span class="badge pending">Da scrivere</span>
-            <h3>Modulo 4: Ethernet e Switching</h3>
-            <p class="module-desc">Standard IEEE 802.3, domini di collisione e di broadcast, funzionamento degli Switch e protocollo ARP.</p>
+            <h3>Modulo 6: VLAN</h3>
+            <p class="module-desc">Segmentazione logica della rete, VLAN tagged/untagged, protocollo 802.1Q, Inter-VLAN routing.</p>
             <span class="module-link" style="color: #888; cursor: not-allowed;">Non disponibile</span>
         </div>
 
         <div class="module-card">
             <span class="badge pending">Da scrivere</span>
-            <h3>Modulo 5: Reti Wireless (Wi-Fi)</h3>
-            <p class="module-desc">Standard IEEE 802.11, architettura (BSS, ESS, Access Point) e tecniche di accesso al mezzo (CSMA/CA).</p>
+            <h3>Modulo 7: Reti Wireless (Wi-Fi)</h3>
+            <p class="module-desc">Standard IEEE 802.11 (a/b/g/n/ac/ax), architettura BSS/ESS, Access Point, tecnica CSMA/CA e sicurezza WPA2/WPA3.</p>
             <span class="module-link" style="color: #888; cursor: not-allowed;">Non disponibile</span>
         </div>
 
         <div class="module-card">
             <span class="badge pending">Da scrivere</span>
-            <h3>Modulo 6: Livello di Rete (IPv4)</h3>
-            <p class="module-desc">Il protocollo IP, struttura dell'header IPv4, indirizzamento logico, classi di indirizzi e IP privati/pubblici.</p>
+            <h3>Modulo 8: Livello di Rete (IPv4)</h3>
+            <p class="module-desc">Protocollo IP, struttura dell'header IPv4, indirizzamento logico, classi di indirizzi, IP privati/pubblici e frammentazione.</p>
             <span class="module-link" style="color: #888; cursor: not-allowed;">Non disponibile</span>
         </div>
 
         <div class="module-card">
             <span class="badge pending">Da scrivere</span>
-            <h3>Modulo 7: Subnetting e VLSM</h3>
-            <p class="module-desc">Maschere di sottorete (Subnet Mask), calcolo degli indirizzi di rete e di broadcast, suddivisione a maschera variabile.</p>
+            <h3>Modulo 9: VLSM e Supernetting</h3>
+            <p class="module-desc">Subnetting a maschera variabile (VLSM), aggregazione di rotte (CIDR), progettazione gerarchica degli indirizzi.</p>
             <span class="module-link" style="color: #888; cursor: not-allowed;">Non disponibile</span>
+        </div>
+
+        <div class="module-card">
+            <span class="badge pending">Da scrivere</span>
+            <h3>Modulo 10: Routing</h3>
+            <p class="module-desc">Routing statico e dinamico, protocolli distance-vector (RIP) e link-state (OSPF), tabelle di routing, metrica e convergenza.</p>
+            <span class="module-link" style="color: #888; cursor: not-allowed;">Non disponibile</span>
+        </div>
+
+        <div class="module-card">
+            <span class="badge pending">Da scrivere</span>
+            <h3>Modulo 11: NAT e PAT</h3>
+            <p class="module-desc">Network Address Translation, PAT (NAT overload), NAT statico e dinamico, ruolo nel passaggio da indirizzi privati a pubblici.</p>
+            <span class="module-link" style="color: #888; cursor: not-allowed;">Non disponibile</span>
+        </div>
+
+        <div class="module-card">
+            <span class="badge pending">Da scrivere</span>
+            <h3>Modulo 12: Livello di Trasporto</h3>
+            <p class="module-desc">TCP e UDP a confronto, three-way handshake, controllo di flusso e congestione, numeri di porta e socket.</p>
+            <span class="module-link" style="color: #888; cursor: not-allowed;">Non disponibile</span>
+        </div>
+
+    </div>
+
+    <!-- ===================== SERVIZI E SICUREZZA ===================== -->
+    <h2 id="servizi-sicurezza">Servizi, sicurezza e reti avanzate</h2>
+
+    <div class="modules-grid">
+
+        <div class="module-card">
+            <span class="badge pending">Da scrivere</span>
+            <h3>Modulo 13: DNS e DHCP</h3>
+            <p class="module-desc">Risoluzione dei nomi (DNS, record A/MX/CNAME/PTR, gerarchia), assegnazione automatica degli indirizzi IP tramite DHCP.</p>
+            <span class="module-link" style="color: #888; cursor: not-allowed;">Non disponibile</span>
+        </div>
+
+        <div class="module-card">
+            <span class="badge pending">Da scrivere</span>
+            <h3>Modulo 14: HTTP e HTTPS</h3>
+            <p class="module-desc">Protocollo HTTP/1.1 e HTTP/2, metodi (GET, POST…), codici di stato, cookie, sessioni e differenze con HTTPS/TLS.</p>
+            <span class="module-link" style="color: #888; cursor: not-allowed;">Non disponibile</span>
+        </div>
+
+        <div class="module-card">
+            <span class="badge pending">Da scrivere</span>
+            <h3>Modulo 15: Posta Elettronica</h3>
+            <p class="module-desc">Protocolli SMTP, POP3 e IMAP, architettura MTA/MUA, flusso di un messaggio e-mail, MIME e spam filtering.</p>
+            <span class="module-link" style="color: #888; cursor: not-allowed;">Non disponibile</span>
+        </div>
+
+        <div class="module-card">
+            <span class="badge pending">Da scrivere</span>
+            <h3>Modulo 16: FTP e protocolli di trasferimento</h3>
+            <p class="module-desc">FTP attivo e passivo, SFTP, SCP, differenze di sicurezza; cenni a Telnet vs SSH.</p>
+            <span class="module-link" style="color: #888; cursor: not-allowed;">Non disponibile</span>
+        </div>
+
+        <div class="module-card">
+            <span class="badge pending">Da scrivere</span>
+            <h3>Modulo 17: IPv6</h3>
+            <p class="module-desc">Struttura dell'header IPv6, notazione esadecimale, tipi di indirizzo (unicast, multicast, anycast), confronto con IPv4 e meccanismi di transizione.</p>
+            <span class="module-link" style="color: #888; cursor: not-allowed;">Non disponibile</span>
+        </div>
+
+        <div class="module-card">
+            <span class="badge pending">Da scrivere</span>
+            <h3>Modulo 18: Crittografia</h3>
+            <p class="module-desc">Crittografia simmetrica (AES, DES) e asimmetrica (RSA), funzioni hash (SHA), firma digitale, certificati X.509 e PKI.</p>
+            <span class="module-link" style="color: #888; cursor: not-allowed;">Non disponibile</span>
+        </div>
+
+        <div class="module-card">
+            <span class="badge pending">Da scrivere</span>
+            <h3>Modulo 19: TLS/SSL e HTTPS</h3>
+            <p class="module-desc">Handshake TLS, negoziazione cifrari, certificati e catena di fiducia, differenze tra SSL, TLS 1.2 e TLS 1.3.</p>
+            <span class="module-link" style="color: #888; cursor: not-allowed;">Non disponibile</span>
+        </div>
+
+        <div class="module-card">
+            <span class="badge pending">Da scrivere</span>
+            <h3>Modulo 20: Firewall e Sicurezza Perimetrale</h3>
+            <p class="module-desc">Firewall stateless e stateful, ACL, DMZ, proxy e reverse proxy, IDS/IPS, architetture di rete sicure.</p>
+            <span class="module-link" style="color: #888; cursor: not-allowed;">Non disponibile</span>
+        </div>
+
+        <div class="module-card">
+            <span class="badge pending">Da scrivere</span>
+            <h3>Modulo 21: VPN e Tunneling</h3>
+            <p class="module-desc">Reti private virtuali, protocolli IPSec e OpenVPN, tunneling (GRE, L2TP), VPN site-to-site e client-to-site.</p>
+            <span class="module-link" style="color: #888; cursor: not-allowed;">Non disponibile</span>
+        </div>
+
+        <div class="module-card">
+            <span class="badge pending">Da scrivere</span>
+            <h3>Modulo 22: Reti Aziendali e Cloud</h3>
+            <p class="module-desc">Architetture LAN/WAN aziendali, SLA, QoS, cenni a SDN; modelli cloud (IaaS, PaaS, SaaS) e virtualizzazione di rete.</p>
+            <span class="module-link" style="color: #888; cursor: not-allowed;">Non disponibile</span>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
