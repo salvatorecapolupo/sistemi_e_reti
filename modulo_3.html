@@ -323,13 +323,20 @@
         <em>Fonte di riferimento: Libro di testo [ISBN: 978-88-203-8320-5]</em>
     </div>
     
-    <h2 id="esercizi">1. Masterclass Subnetting: Generatore e Correttore Avanzato</h2>
-    <p>Usa questo strumento per esercitarti sui calcoli di rete complessi. Il sistema genererà un IP casuale con una maschera a lunghezza variabile (CIDR da /8 a /30).</p>
-    <p><strong>Regole:</strong> Hai a disposizione <strong>massimo 3 tentativi</strong>. Il punteggio è calcolato in base alle risposte esatte fornite. Nei primi due tentativi ti verrà indicato solo quali campi hai sbagliato (senza rivelare la soluzione) e le tue risposte si coloreranno di conseguenza. Se esaurisci i tentativi, le soluzioni verranno svelate e l'esercizio sarà terminato.</p>
+    <h2 id="esercizi">1. Subnetting: Generatore / Correttore Avanzato</h2>
+    <p>Usa questo strumento per esercitarti sui calcoli di rete e subnetting/supernetting. Mediante un click su "genera nuova rete casuale", 
+        il sistema genererà un IPv4 con una maschera a lunghezza variabile (CIDR da /8 a /30). Attenzione: i dati generati hanno scopo puramente
+    didattico e potrebbero non applicarsi a tutti i casi reali.</p>
+    <p><strong>Regole:</strong> Hai a disposizione <strong>3 tentativi</strong>. 
+        Il punteggio è calcolato in base alle risposte esatte fornite. 
+        Nei primi due tentativi ti verrà indicato solo quali campi hai sbagliato (senza rivelare la soluzione) 
+        e le tue risposte si coloreranno di conseguenza. Se esaurisci i tentativi, le soluzioni verranno svelate 
+        e l'esercizio sarà concluso. È opportuno ottenere un punteggio - su un campione di molti test - 
+        <strong>superiore all'80%</strong> per considerarsi "mediamente" preparati sull'argomento. </p>
 
     <div class="tool-container">
         <div class="tool-header">
-            <h3>Laboratorio di Indirizzamento</h3>
+            <h3>Subnetting e piani di indirizzamento</h3>
             <div class="score-board">
                 <span class="attempt-display" id="attempt-display">Tentativo: 1/3</span>
                 <span class="score-display" id="score-display">Punteggio: 0%</span>
@@ -339,7 +346,7 @@
 
         <!-- 4) IP/CIDR editabile -->
         <div class="exercise-box">
-            Analizza il seguente indirizzo IP e prefisso CIDR:<br>
+            Analizza il seguente indirizzo IPv4 con prefisso CIDR:<br>
             <div class="ip-edit-row">
                 <input type="text" id="in-ip-manual" maxlength="15" placeholder="0.0.0.0" autocomplete="off" spellcheck="false">
                 <span class="slash">/</span>
@@ -353,7 +360,7 @@
 
         <div class="form-grid">
             <div class="form-group">
-                <label for="in-class">1. Classe</label>
+                <label for="in-class">1. Indica la classe dell'IP (senza CIDR) </label>
                 <select id="in-class">
                     <option value="">Seleziona la classe...</option>
                     <option value="A">Classe A</option>
@@ -378,23 +385,23 @@
             <div class="form-group">
                 <label for="in-first">4. Primo IP Assegnabile</label>
                 <input type="text" id="in-first" placeholder="es. 192.168.1.33">
-                <span class="edu-hint">È l'indirizzo di rete + 1.&#10;Solo il quarto ottetto cambia (se l'HostID è nell'ultimo ottetto).</span>
+                <span class="edu-hint">È l'indirizzo di rete + 1.&#10; Ad esempio: solo il quarto ottetto cambia, se l'HostID è nell'ultimo ottetto.</span>
             </div>
 
             <div class="form-group">
-                <label for="in-last">5. Ultimo IP Assegnabile</label>
+                <label for="in-last">5. Ultimo IP assegnabile</label>
                 <input type="text" id="in-last" placeholder="es. 192.168.1.62">
                 <span class="edu-hint">È il broadcast − 1.&#10;Tutti i bit host a 1, poi sottrai 1 al risultato.</span>
             </div>
 
             <div class="form-group">
-                <label for="in-bcast">6. Indirizzo di Broadcast</label>
+                <label for="in-bcast">6. Indirizzo di broadcast</label>
                 <input type="text" id="in-bcast" placeholder="es. 192.168.1.63">
-                <span class="edu-hint">Prendi l'indirizzo di rete e porta tutti i bit dell'HostID a 1.&#10;Equivale a: rete OR (NOT maschera).</span>
+                <span class="edu-hint">Prendi l'indirizzo di rete e porta tutti i bit dell'HostID a 1.&#10;</span>
             </div>
 
             <div class="form-group">
-                <label for="in-hosts">7. Numero totale di Host assegnabili</label>
+                <label for="in-hosts">7. Numero di host assegnabili</label>
                 <input type="number" id="in-hosts" placeholder="es. 30">
                 <span class="edu-hint">Formula: 2^(32−CIDR) − 2&#10;Si sottraggono l'indirizzo di rete e il broadcast.</span>
             </div>
@@ -411,11 +418,16 @@
     </div>
 
         <h2>2. Composizione e Logica degli Indirizzi IPv4</h2>
-    <p>Il protocollo IP fornisce l'indirizzo logico per l'identificazione all'interno di una rete basata sull'architettura TCP/IP. È importante notare che un indirizzo IP non identifica univocamente l'intero dispositivo (host), ma una sua specifica interfaccia di rete. Un router, ad esempio, per svolgere la sua funzione di collegamento tra tre reti differenti, dovrà possedere almeno tre indirizzi IP distinti (uno per ciascuna interfaccia connessa).</p>
+    <p>Il protocollo IP fornisce l'indirizzo logico per l'identificazione all'interno di una rete basata sull'architettura TCP/IP. 
+        È importante notare che un indirizzo IP non identifica univocamente l'intero dispositivo (host), ma una sua specifica 
+        interfaccia di rete. Un router, ad esempio, per svolgere la sua funzione di collegamento tra tre reti differenti, dovrà 
+        possedere di solito almeno altrettanti indirizzi IP distinti (uno per ciascuna interfaccia).</p>
     
-    <p>Un indirizzo IPv4 è formato da 32 bit raggruppati in quattro byte (definiti comunemente ottetti), ed è quasi sempre espresso nella notazione decimale puntata composta da quattro numeri compresi tra 0 e 255.</p>
-
-    
+    <p>Un indirizzo IPv4 è formato da 32 bit raggruppati in quattro byte (definiti ottetti), 
+        ed è quasi sempre espresso nella notazione decimale puntata composta da quattro numeri compresi tra 0 e 255.
+    Esempi di indirizzi IP: 192.168.12.0, 10.1.18.24, 127.0.0.1, ... in tutte le 2<sup>32</sup>=4.294.967.296 combinazioni possibili
+        (oltre 4 miliardi di IP generabili, che sono comunque "pochi" per coprire il fabbisogno di dispositivi mondiali: motivo per cui
+        è stato inventato IPv6.). </p>
     
     <p>Dal punto di vista logico e di instradamento, l'indirizzo IP è formato da due porzioni fondamentali:</p>
     <ul>
@@ -424,7 +436,10 @@
     </ul>
 
     <h2>3. Classi di Indirizzamento Storiche e Indirizzi Riservati</h2>
-    <p>In origine, la suddivisione tra i bit destinati alla rete e quelli per l'host avveniva in modo rigido in base al valore assunto dai primi bit (i bit più significativi) dell'indirizzo, secondo un metodo denominato <em>classful</em>.</p>
+    <p>In origine, la suddivisione tra i bit destinati alla rete e quelli per l'host 
+        avveniva in modo rigido in base al valore assunto dai primi bit (i bit più significativi) 
+        dell'indirizzo, secondo un metodo denominato <em>classful</em>. Oggi la distinzione tra 
+    le classi è soprattutto didattica.</p>
     
     
     
@@ -435,7 +450,7 @@
         </tr>
         <tr>
             <td><strong>Classe A</strong></td>
-            <td>Identificabile dal primo bit posto fisso a <code>0</code>, utilizza un solo ottetto per la rete e tre ottetti per l'host. Copre l'intervallo da 0.0.0.0 a 127.255.255.255 ed è concepita per reti di proporzioni vastissime. L'indirizzo di loopback (127.0.0.1) vi appartiene ed è riservato ai test di diagnostica interna dell'host senza inviare pacchetti in rete.</td>
+            <td>Identificabile dal primo bit posto fisso a <code>0</code>, utilizza un solo ottetto per la rete e tre ottetti per l'host. Copre l'intervallo da 0.0.0.0 a 127.255.255.255 ed è concepita per reti di proporzioni vastissime. L'indirizzo di loopback (127.0.0.1, detto anche localhost) vi appartiene ed è riservato ai test di diagnostica interna dell'host senza inviare pacchetti in rete.</td>
         </tr>
         <tr>
             <td><strong>Classe B</strong></td>
@@ -451,26 +466,47 @@
 
     <p>Vi sono inoltri vincoli stringenti per l'assegnazione alle macchine:</p>
     <ul>
-        <li>L'indirizzo che presenta tutti i bit della porzione HostID impostati a <code>0</code> rappresenta l'identificativo dell'intera rete e non è assegnabile.</li>
+        <li>L'indirizzo che presenta tutti i bit della porzione HostID impostati a <code>0</code> rappresenta l'identificativo dell'intera rete, e non è assegnabile.</li>
         <li>L'indirizzo con tutti i bit dell'HostID impostati a <code>1</code> funge da indirizzo di broadcast, utilizzato per diffondere comunicazioni simultanee a tutti gli appartenenti della rete.</li>
     </ul>
 
-    <p>Per affrontare l'esaurimento progressivo degli indirizzi IPv4, sono state separate ampie porzioni di indirizzi cosiddetti <strong>privati</strong> (come i range 10.x.x.x, 172.16.x.x e 192.168.x.x). Questi non sono in alcun modo instradabili sulla rete pubblica Internet e vengono impiegati per le LAN, collegandosi all'esterno solo per mezzo di sistemi NAT (Network Address Translation) o Proxy server. Un particolare blocco è il 169.254.x.x (APIPA) che l'host si auto-assegna quando non riesce ad acquisire l'indirizzo da un server DHCP.</p>
+    <p>Per affrontare l'esaurimento degli indirizzi IPv4, sono state separate ampie porzioni di indirizzi <strong>privati</strong> 
+        (come i range 10.x.x.x, 172.16.x.x e 192.168.x.x). Questi non sono in alcun modo instradabili sulla rete pubblica Internet 
+        e vengono impiegati per le LAN, <strong>collegandosi all'esterno solo per mezzo di sistemi NAT (Network Address Translation) o Proxy</strong>.
+        Un particolare blocco è il 169.254.x.x (APIPA), che l'host si auto-assegna quando non riesce ad acquisire l'indirizzo da un server DHCP.</p>
 
     <h2>4. Pianificazione di Reti: La Tecnica del Subnetting</h2>
-    <p>Per limitare gli sprechi di indirizzi e ridurre il traffico (segmentando così i domini di broadcast), le reti vengono ulteriormente frazionate in unità logiche dette sottoreti, tramite la tecnica del <strong>Subnetting</strong>.</p>
+    <p>Per limitare gli sprechi di indirizzi e ridurre il traffico (segmentando così i domini di broadcast), 
+        le reti vengono ulteriormente frazionate in unità logiche dette sottoreti, tramite la tecnica del <strong>subnetting</strong>.</p>
     
     
     
-    <p>L'operazione in sé si concretizza "sacrificando" e convertendo un quantitativo di bit, originariamente dedicati alla sezione Host, per tramutarli in un <strong>SubnetID</strong>.</p>
+    <p>L'operazione in sé si concretizza "sacrificando" e convertendo un quantitativo di bit, 
+        originariamente dedicati alla sezione Host, per tramutarli in un <strong>SubnetID</strong>.</p>
 
     <h3>Metodo pratico di calcolo per il dimensionamento</h3>
-    <p>In fase di progettazione, se l'esigenza è quella di produrre un quantitativo predefinito di sottoreti ($N$), occorre stabilire esattamente quanti bit ($X$) prelevare dall'HostID. La regola matematica indica che bisogna individuare la potenza del 2 superiore o al limite uguale al numero di sottoreti volute.</p>
-    <p><strong>Un esempio applicativo:</strong> Immaginiamo che il progetto esiga la creazione di 50 subnet. Sottrarre 5 bit non basterebbe, dal momento che $2^5 = 32$ (minore di 50). Diventa dunque obbligatorio appropriarsi di 6 bit, che garantiscono $2^6 = 64$ sottoreti disponibili. Fatta questa scelta, è vitale verificare se la classe di rete è capiente: partendo da un IP in Classe C (il quale offre solo 8 bit per gli host), sottraendone 6 resterebbero solo 2 bit liberi ($8 - 6 = 2$) per indicizzare i computer. Il risultato concederebbe solamente 2 host configurabili per ogni subnet ($2^2 - 2 = 2$ indirizzi utilizzabili), rendendo questa strada altamente limitante in vista di un ampliamento dell'infrastruttura.</p>
+    <p>In fase di progettazione, se l'esigenza è quella di produrre un quantitativo predefinito di sottoreti (N), 
+        occorre stabilire esattamente quanti bit ($X$) prelevare dall'HostID. La regola matematica indica che 
+        bisogna individuare la potenza del 2 superiore o al limite uguale al numero di sottoreti volute.</p>
+    <p><strong>Un esempio applicativo:</strong> Immaginiamo che il progetto esiga la creazione di 50 subnet. 
+        Sottrarre 5 bit non basterebbe, dal momento che 2<sup>5</sup> = 32 (che è minore di 50). 
+        Diventa dunque obbligatorio "rubare" 6 bit, che garantiscono 2<sup>6</sup> = 64 > 50 sottoreti. 
+        Fatta questa scelta, è vitale verificare se la classe di rete è capiente: 
+        partendo da un IP in Classe C (il quale offre solo 8 bit per gli host), 
+        sottraendone 6 resterebbero solo 2 bit liberi ($8 - 6 = 2$) per indicizzare i computer. 
+        Il risultato concederebbe solamente 2 host configurabili per ogni subnet (2<sup>2</sup> - 2 = 2 indirizzi utilizzabili), 
+        rendendo questa strada altamente limitante in vista di un ampliamento dell'infrastruttura.</p>
 
     <h3>Il ruolo della Subnet Mask</h3>
-    <p>Ai dispositivi in rete, come i router, occorre uno strumento per dedurre all'istante l'esatta conformazione della rete e il suo frazionamento. A questo scopo si adotta la <strong>Subnet Mask</strong> (Maschera di Sottorete), una stringa di 32 bit dove i bit in corrispondenza del NetID e del SubnetID assumono tutti categoricamente valore <code>1</code>, mentre quelli pertinenti alla quota HostID assumono valore <code>0</code>.</p>
-    <p>Vista la natura sequenziale dei bit impostati a "1", un intero ottetto in formato decimale in una maschera valida può produrre inequivocabilmente solo uno di questi valori: 0, 128, 192, 224, 240, 248, 252, 254 oppure 255. È per questo motivo che una stringa irregolare, come "255.255.255.150", non sarà mai considerata dal sistema una subnet mask legittima.</p>
+    <p>Ai dispositivi in rete, come i router, occorre uno strumento per dedurre all'istante 
+        l'esatta conformazione della rete e il suo frazionamento. A questo scopo si adotta la 
+        <strong>Subnet Mask</strong> (Maschera di Sottorete), una stringa di 32 bit dove i bit 
+        in corrispondenza del NetID e del SubnetID assumono tutti categoricamente valore <code>1</code>, 
+        mentre quelli pertinenti alla quota HostID assumono valore <code>0</code>.</p>
+    <p>Vista la natura sequenziale dei bit impostati a "1", un intero ottetto in formato decimale 
+        in una maschera valida può produrre inequivocabilmente solo uno di questi valori: 
+        0, 128, 192, 224, 240, 248, 252, 254 oppure 255. È per questo motivo che una stringa irregolare, 
+        come "255.255.255.150", non sarà mai considerata dal sistema una subnet mask legittima.</p>
 
 
 
