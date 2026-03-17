@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modulo 4: Livello Data Link - Sistemi e Reti</title>
+    <style>
+        :root {
+            --wiki-bg: #f6f6f6;
+            --wiki-border: #a2a9b1;
+            --wiki-blue: #0645ad;
+            --wiki-blue-hover: #0b0080;
+            --layer-link: #ffffcc;
+            --success: #d5fdf4;
+            --success-border: #006b54;
+            --error: #fde8e8;
+            --error-border: #b30000;
+        }
+
+        body {
+            font-family: sans-serif;
+            background-color: var(--wiki-bg);
+            color: #202122;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            background: white;
+            padding: 30px;
+            border: 1px solid var(--wiki-border);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .top-nav {
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            background: #f8f9fa;
+            padding: 10px 15px;
+            border: 1px solid var(--wiki-border);
+            border-radius: 4px;
+        }
+
+        h1, h2, h3 {
+            font-family: "Linux Libertine", "Georgia", "Times", serif;
+            border-bottom: 1px solid var(--wiki-border);
+            padding-bottom: 5px;
+            font-weight: normal;
+        }
+
+        h1 { font-size: 2em; margin-top: 0; }
+
+        a { color: var(--wiki-blue); text-decoration: none; }
+        a:hover { text-decoration: underline; color: var(--wiki-blue-hover); }
+
+        .layer-badge {
+            background-color: var(--layer-link);
+            padding: 5px 10px;
+            border: 1px solid #888;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        /* TOC */
+        .toc {
+            background: #f8f9fa;
+            border: 1px solid var(--wiki-border);
+            padding: 15px;
+            display: inline-block;
+            margin: 20px 0;
+            font-size: 0.95em;
+            min-width: 280px;
+        }
+        .toc b { display: block; margin-bottom: 5px; }
+        .toc ul { list-style: none; padding-left: 20px; margin: 0; }
+        .toc > ul { padding-left: 0; }
+        .toc li { margin: 3px 0; }
+
+        table.wikitable {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.95em;
+        }
+        table.wikitable th, table.wikitable td {
+            border: 1px solid var(--wiki-border);
+            padding: 8px;
+            text-align: left;
+        }
+        table.wikitable th { background-color: #f2f2f2; }
+
+        /* ---- SIMULATORE FRAME ---- */
+        .simulator-container {
+            background: #f8f9fa;
+            border: 1px solid var(--wiki-border);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .simulator-container h2 {
+            border-bottom: 1px solid var(--wiki-border);
+            font-family: "Linux Libertine", "Georgia", "Times", serif;
+            font-weight: normal;
+            font-size: 1.5em;
+            padding-bottom: 5px;
+            margin-top: 0;
+        }
+
+        .frame-builder {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .frame-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .frame-field {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .frame-field label {
+            font-size: 0.85em;
+            font-weight: bold;
+            color: #444;
+        }
+
+        .frame-field input {
+            font-family: monospace;
+            font-size: 0.95em;
+            padding: 6px 8px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .frame-field input:focus {
+            outline: none;
+            border-color: var(--wiki-blue);
+            box-shadow: 0 0 0 2px rgba(6,69,173,0.15);
+        }
+
+        .frame-field .hint {
+            font-size: 0.75em;
+            color: #666;
+        }
+
+        .btn {
+            background-color: var(--wiki-blue);
+            color: white;
+            border: none;
+            padding: 9px 18px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            transition: 0.2s;
+            align-self: flex-start;
+        }
+        .btn:hover { background-color: var(--wiki-blue-hover); }
+        .btn-secondary { background-color: #6c757d; }
+        .btn-secondary:hover { background-color: #5a6268; }
+
+        /* Frame visualizzato */
+        .frame-visual {
+            margin-top: 10px;
+            overflow-x: auto;
+        }
+
+        .frame-row {
+            display: flex;
+            border: 2px solid #555;
+            border-radius: 4px;
+            overflow: hidden;
+            min-width: 600px;
+            font-family: monospace;
+            font-size: 0.85em;
+        }
+
+        .frame-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 4px;
+            border-right: 1px solid #888;
+            text-align: center;
+            cursor: pointer;
+            transition: filter 0.2s;
+            min-height: 60px;
+        }
+
+        .frame-cell:last-child { border-right: none; }
+        .frame-cell:hover { filter: brightness(0.92); }
+        .frame-cell.active { filter: brightness(0.85); box-shadow: inset 0 0 0 2px #333; }
+
+        .frame-cell .field-name {
+            font-weight: bold;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+            white-space: nowrap;
+        }
+
+        .frame-cell .field-val {
+            font-size: 0.9em;
+            word-break: break-all;
+            max-width: 120px;
+        }
+
+        .frame-cell .field-size {
+            font-size: 0.7em;
+            color: #555;
+            margin-top: 3px;
+        }
+
+        /* colori campi */
+        .fc-preamble  { background: #e8e8e8; flex: 0 0 80px; }
+        .fc-sfd       { background: #ffd966; flex: 0 0 50px; }
+        .fc-dst-mac   { background: #f4cccc; flex: 0 0 110px; }
+        .fc-src-mac   { background: #cfe2f3; flex: 0 0 110px; }
+        .fc-etype     { background: #d9ead3; flex: 0 0 70px; }
+        .fc-payload   { background: #fff2cc; flex: 1; min-width: 100px; }
+        .fc-fcs       { background: #ead1dc; flex: 0 0 70px; }
+
+        .frame-info-panel {
+            background: white;
+            border: 1px solid var(--wiki-border);
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 12px;
+            min-height: 80px;
+        }
+
+        .frame-info-panel h4 {
+            margin: 0 0 8px 0;
+            font-family: "Linux Libertine","Georgia","Times",serif;
+            font-weight: normal;
+            font-size: 1.1em;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .frame-info-panel p { margin: 0; font-size: 0.95em; }
+
+        .btn-row { display: flex; gap: 10px; }
+
+        /* ---- QUIZ ---- */
+        .tool-container {
+            background-color: #f8f9fa;
+            border: 1px solid var(--wiki-border);
+            padding: 25px;
+            border-radius: 5px;
+            margin-top: 30px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+        }
+
+        .tool-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tool-header h3 {
+            border: none;
+            margin: 0;
+            font-family: sans-serif;
+            font-weight: bold;
+            font-size: 1em;
+        }
+
+        .score-board {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .score-display, .attempt-display {
+            font-size: 1.1em;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 4px;
+            background: #fff;
+            border: 1px solid #ccc;
+            color: black;
+        }
+
+        .exercise-box {
+            background: #fff;
+            padding: 20px;
+            border: 2px dashed #a2a9b1;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            text-align: center;
+        }
+
+        .exercise-box .question-text {
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        /* opzioni quiz */
+        .quiz-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+            text-align: left;
+        }
+
+        .quiz-option {
+            background: white;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            padding: 10px 14px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: border-color 0.15s, background 0.15s;
+        }
+
+        .quiz-option:hover:not(.disabled) { border-color: var(--wiki-blue); background: #f0f4ff; }
+        .quiz-option.correct  { border-color: var(--success-border); background: var(--success); }
+        .quiz-option.wrong    { border-color: var(--error-border);   background: var(--error); }
+        .quiz-option.disabled { cursor: default; }
+
+        .feedback {
+            margin-top: 12px;
+            padding: 10px 14px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            display: none;
+        }
+        .feedback.ok  { background: var(--success); border: 1px solid var(--success-border); display: block; }
+        .feedback.ko  { background: var(--error);   border: 1px solid var(--error-border);   display: block; }
+
+        .result-box {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.1em;
+        }
+
+        hr { border: none; border-top: 1px solid var(--wiki-border); margin: 30px 0; }
+
+        /* nota */
+        .nota {
+            background: #f8f9fa;
+            border-left: 3px solid var(--wiki-blue);
+            padding: 10px 15px;
+            margin: 15px 0;
+            font-size: 0.95em;
+        }
+
+        /* topologia diagrams */
+        .topology-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .topology-card {
+            border: 1px solid var(--wiki-border);
+            border-radius: 4px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: box-shadow 0.2s;
+            background: white;
+        }
+
+        .topology-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        .topology-card.active { border-color: var(--wiki-blue); box-shadow: 0 0 0 2px rgba(6,69,173,0.3); }
+
+        .topology-card svg { display: block; margin: 0 auto 8px; }
+        .topology-card .tname { font-weight: bold; font-size: 0.9em; }
+        .topology-card .tdesc { font-size: 0.78em; color: #555; margin-top: 4px; }
+
+        .topology-detail {
+            background: white;
+            border: 1px solid var(--wiki-border);
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 8px;
+        }
+
+        .topology-detail h4 {
+            margin: 0 0 8px;
+            font-family: "Linux Libertine","Georgia","Times",serif;
+            font-weight: normal;
+        }
+
+        @media (max-width: 640px) {
+            .frame-inputs { grid-template-columns: 1fr; }
+            .quiz-options  { grid-template-columns: 1fr; }
+            .topology-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="top-nav">
+        <a href="index.html">← Torna all'Indice del Corso</a> |
+        <a href="modulo_3.html">Modulo 3</a> &gt; <strong>Modulo 4: Livello Data Link</strong> &gt; <a href="modulo_5.html">Modulo 5</a>
+    </div>
+
+    <h1>Modulo 4: Livello Data Link (Livello 2)</h1>
+
+    <span class="layer-badge">🔗 Livello OSI 2 — Collegamento Dati</span>
+
+    <p>Il <strong>Livello Data Link</strong> (o livello di collegamento dati) è il secondo livello del modello ISO/OSI. Il suo compito è permettere la comunicazione affidabile tra due nodi <em>direttamente connessi</em> sullo stesso collegamento fisico. Riceve bit grezzi dal livello fisico e li organizza in unità logiche chiamate <strong>trame (frame)</strong>, aggiungendo indirizzamento fisico, rilevamento degli errori e controllo del flusso locale.</p>
+
+    <div class="nota">
+        <strong>Posizione nello stack:</strong> Il Data Link si colloca tra il Livello Fisico (bit/segnali) e il Livello di Rete (pacchetti IP). Il dispositivo di riferimento è lo <strong>switch</strong>.
+    </div>
+
+    <!-- SIMULATORE FRAME -->
+    <div class="simulator-container">
+        <h2>🖧 Costruttore di Frame Ethernet II</h2>
+        <p>Compila i campi e clicca su <em>Costruisci Frame</em>. Poi clicca su ogni campo della trama per leggerne la descrizione.</p>
+
+        <div class="frame-builder">
+            <div class="frame-inputs">
+                <div class="frame-field">
+                    <label>MAC Destinazione</label>
+                    <input type="text" id="in-dst" value="FF:FF:FF:FF:FF:FF" maxlength="17" placeholder="AA:BB:CC:DD:EE:FF">
+                    <span class="hint">6 byte · 12 cifre hex · FF:FF… = broadcast</span>
+                </div>
+                <div class="frame-field">
+                    <label>MAC Sorgente</label>
+                    <input type="text" id="in-src" value="00:1A:2B:3C:4D:5E" maxlength="17" placeholder="00:1A:2B:3C:4D:5E">
+                    <span class="hint">6 byte · indirizzo scheda mittente</span>
+                </div>
+                <div class="frame-field">
+                    <label>EtherType / Lunghezza</label>
+                    <input type="text" id="in-etype" value="0800" maxlength="4" placeholder="0800">
+                    <span class="hint">0800=IPv4 · 0806=ARP · 86DD=IPv6</span>
+                </div>
+                <div class="frame-field">
+                    <label>Payload (dati)</label>
+                    <input type="text" id="in-payload" value="Ciao rete!" maxlength="50" placeholder="testo o hex">
+                    <span class="hint">46–1500 byte nel frame reale</span>
+                </div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn" onclick="buildFrame()">Costruisci Frame</button>
+                <button class="btn btn-secondary" onclick="resetFrame()">Reset</button>
+            </div>
+
+            <div class="frame-visual" id="frame-visual" style="display:none">
+                <div class="frame-row" id="frame-row"></div>
+                <div class="frame-info-panel" id="frame-info">
+                    <h4 id="fi-title">Seleziona un campo</h4>
+                    <p id="fi-desc">Clicca su un campo della trama per vedere la descrizione dettagliata.</p>
+                </div>
+            </div>
+
+            <div id="frame-error" style="color:#b30000; font-size:0.9em; display:none;"></div>
+        </div>
+    </div>
+
+    <!-- TOC -->
+    <div class="toc">
+        <b>Indice</b>
+        <ul>
+            <li><a href="#funzioni">1. Funzioni del Livello Data Link</a></li>
+            <li><a href="#topologie">2. Topologie di Rete</a></li>
+            <li><a href="#framing">3. Framing: la struttura del Frame Ethernet</a></li>
+            <li><a href="#mac">4. Indirizzi MAC</a></li>
+            <li><a href="#errori">5. Rilevamento e Correzione degli Errori</a></li>
+            <li><a href="#quiz">6. Esercizi Interattivi</a></li>
+        </ul>
+    </div>
+
+    <!-- 1 -->
+    <h2 id="funzioni">1. Funzioni del Livello Data Link</h2>
+    <p>Il livello Data Link è suddiviso in due sottostrati definiti dall'IEEE:</p>
+    <ul>
+        <li><strong>LLC (Logical Link Control) — IEEE 802.2:</strong> gestisce il controllo del flusso e degli errori; fa da interfaccia verso il livello di rete superiore.</li>
+        <li><strong>MAC (Medium Access Control):</strong> gestisce l'accesso al mezzo trasmissivo condiviso e l'indirizzamento fisico tramite indirizzi MAC.</li>
+    </ul>
+
+    <table class="wikitable">
+        <tr>
+            <th>Funzione</th>
+            <th>Descrizione</th>
+        </tr>
+        <tr>
+            <td><strong>Framing</strong></td>
+            <td>Incapsula i pacchetti del livello di rete in <em>frame</em>, aggiungendo intestazione e coda con informazioni di controllo.</td>
+        </tr>
+        <tr>
+            <td><strong>Indirizzamento fisico (MAC)</strong></td>
+            <td>Ogni scheda di rete ha un indirizzo MAC univoco a 48 bit. Il livello Data Link usa questi indirizzi per consegnare il frame al nodo corretto <em>nella stessa rete locale</em>.</td>
+        </tr>
+        <tr>
+            <td><strong>Accesso al mezzo (MAC)</strong></td>
+            <td>Regola chi può trasmettere sul mezzo condiviso (es. CSMA/CD per Ethernet, CSMA/CA per Wi-Fi).</td>
+        </tr>
+        <tr>
+            <td><strong>Rilevamento degli errori</strong></td>
+            <td>Tramite FCS/CRC, il ricevitore può verificare se il frame è stato corrotto durante la trasmissione.</td>
+        </tr>
+        <tr>
+            <td><strong>Controllo del flusso</strong></td>
+            <td>Evita che un trasmettitore veloce sommerga un ricevitore lento (più rilevante nei WAN).</td>
+        </tr>
+    </table>
+
+    <hr>
+
+    <!-- 2 -->
+    <h2 id="topologie">2. Topologie di Rete</h2>
+    <p>La <strong>topologia</strong> descrive come i nodi sono collegati fisicamente o logicamente. Influenza le prestazioni, la fault-tolerance e il costo dell'infrastruttura.</p>
+
+    <!-- Esplora topologie interattivo -->
+    <div class="simulator-container">
+        <h2>🔭 Esplora le Topologie</h2>
+        <p>Clicca su una topologia per vedere vantaggi, svantaggi e casi d'uso.</p>
+        <div class="topology-grid" id="topo-grid"></div>
+        <div class="topology-detail" id="topo-detail" style="display:none">
+            <h4 id="td-title"></h4>
+            <div id="td-body"></div>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- 3 -->
+    <h2 id="framing">3. Framing: la struttura del Frame Ethernet II</h2>
+    <p>Lo standard <strong>Ethernet II</strong> (DIX) è il formato di frame più diffuso nelle LAN odierne. È definito dall'IEEE 802.3 e ha la seguente struttura:</p>
+
+    <table class="wikitable">
+        <tr>
+            <th>Campo</th>
+            <th>Dimensione</th>
+            <th>Descrizione</th>
+        </tr>
+        <tr>
+            <td><strong>Preambolo</strong></td>
+            <td>7 byte</td>
+            <td>Sequenza alternata di 0 e 1 (10101010…) che permette ai dispositivi di sincronizzarsi con la trasmissione in arrivo.</td>
+        </tr>
+        <tr>
+            <td><strong>SFD (Start Frame Delimiter)</strong></td>
+            <td>1 byte</td>
+            <td>Valore fisso <code>10101011</code>: segnala l'inizio del frame vero e proprio.</td>
+        </tr>
+        <tr>
+            <td><strong>MAC Destinazione</strong></td>
+            <td>6 byte</td>
+            <td>Indirizzo MAC del destinatario. Se tutti i bit sono 1 (<code>FF:FF:FF:FF:FF:FF</code>) è un frame broadcast.</td>
+        </tr>
+        <tr>
+            <td><strong>MAC Sorgente</strong></td>
+            <td>6 byte</td>
+            <td>Indirizzo MAC del mittente.</td>
+        </tr>
+        <tr>
+            <td><strong>EtherType / Lunghezza</strong></td>
+            <td>2 byte</td>
+            <td>Se ≥ 0x0600: indica il protocollo di livello 3 (es. 0x0800 = IPv4). Se &lt; 0x0600: indica la lunghezza del payload (formato 802.3).</td>
+        </tr>
+        <tr>
+            <td><strong>Payload (Dati)</strong></td>
+            <td>46–1500 byte</td>
+            <td>Il pacchetto IP incapsulato. Minimo 46 byte (con padding se necessario); massimo 1500 byte (MTU Ethernet).</td>
+        </tr>
+        <tr>
+            <td><strong>FCS (Frame Check Sequence)</strong></td>
+            <td>4 byte</td>
+            <td>Checksum CRC-32 calcolato su tutti i campi del frame. Il ricevitore ricalcola il CRC: se non corrisponde, il frame viene scartato.</td>
+        </tr>
+    </table>
+
+    <div class="nota">
+        <strong>MTU (Maximum Transmission Unit):</strong> la dimensione massima del payload è 1500 byte. Pacchetti IP più grandi vengono <em>frammentati</em> prima di essere incapsulati.
+    </div>
+
+    <hr>
+
+    <!-- 4 -->
+    <h2 id="mac">4. Indirizzi MAC</h2>
+    <p>L'indirizzo <strong>MAC (Media Access Control)</strong> è un identificatore hardware a <strong>48 bit</strong> (6 byte), solitamente espresso in esadecimale nella forma <code>AA:BB:CC:DD:EE:FF</code>.</p>
+
+    <ul>
+        <li><strong>OUI (Organizationally Unique Identifier):</strong> i primi 3 byte identificano il produttore della scheda di rete (assegnato dall'IEEE).</li>
+        <li><strong>NIC ID:</strong> i restanti 3 byte sono assegnati dal produttore e univoci per ogni scheda.</li>
+        <li><strong>Unicast / Multicast / Broadcast:</strong> se il bit meno significativo del primo byte è 0 = unicast; 1 = multicast. FF:FF:FF:FF:FF:FF = broadcast.</li>
+        <li><strong>Universally Administered (UAA) vs. Locally Administered (LAA):</strong> il secondo bit meno significativo del primo byte indica se l'indirizzo è assegnato dal produttore (0) o configurato localmente (1).</li>
+    </ul>
+
+    <table class="wikitable">
+        <tr>
+            <th>Tipo</th>
+            <th>Esempio</th>
+            <th>Significato</th>
+        </tr>
+        <tr>
+            <td>Unicast</td>
+            <td><code>00:1A:2B:3C:4D:5E</code></td>
+            <td>Frame diretto a una singola scheda di rete</td>
+        </tr>
+        <tr>
+            <td>Broadcast</td>
+            <td><code>FF:FF:FF:FF:FF:FF</code></td>
+            <td>Frame consegnato a tutti i nodi del segmento</td>
+        </tr>
+        <tr>
+            <td>Multicast</td>
+            <td><code>01:00:5E:xx:xx:xx</code></td>
+            <td>Frame consegnato a un gruppo di destinatari (es. multicast IPv4)</td>
+        </tr>
+    </table>
+
+    <hr>
+
+    <!-- 5 -->
+    <h2 id="errori">5. Rilevamento e Correzione degli Errori</h2>
+
+    <h3>5.1 Parità</h3>
+    <p>Il <strong>bit di parità</strong> è il metodo più semplice: si aggiunge un bit al dato in modo che il numero totale di bit a 1 sia pari (parità pari) o dispari (parità dispari). Rileva un numero dispari di errori su singolo bit, ma <em>non li corregge</em>.</p>
+
+    <h3>5.2 CRC (Cyclic Redundancy Check)</h3>
+    <p>Il <strong>CRC</strong> è l'algoritmo usato da Ethernet nel campo FCS. Funziona come una <em>divisione polinomiale</em> tra il dato da trasmettere e un polinomio generatore predefinito (per Ethernet: CRC-32). Il resto di questa divisione è il valore FCS.</p>
+    <ol>
+        <li>Il mittente calcola il CRC sul frame e lo inserisce nel campo FCS.</li>
+        <li>Il ricevitore ricalcola il CRC sul frame ricevuto.</li>
+        <li>Se il CRC calcolato ≠ FCS ricevuto → frame corrotto → <strong>scartato silenziosamente</strong> (il recupero è a carico dei livelli superiori, es. TCP).</li>
+    </ol>
+
+    <div class="nota">
+        <strong>FCS vs checksum IP:</strong> il FCS del livello 2 protegge l'intero frame Ethernet. Il checksum IP (livello 3) protegge solo l'intestazione IP. Sono meccanismi complementari e indipendenti.
+    </div>
+
+    <h3>5.3 Hamming Code (cenni)</h3>
+    <p>A differenza del CRC, il codice di Hamming permette non solo di <em>rilevare</em> ma anche di <em>correggere</em> errori su singolo bit. Viene usato principalmente nelle memorie RAM (ECC) e non nel Data Link Ethernet, ma è parte del programma per comprendere i principi di ridondanza.</p>
+
+    <table class="wikitable">
+        <tr>
+            <th>Tecnica</th>
+            <th>Rileva errori</th>
+            <th>Corregge errori</th>
+            <th>Overhead</th>
+            <th>Uso tipico</th>
+        </tr>
+        <tr>
+            <td>Parità semplice</td>
+            <td>1 bit</td>
+            <td>No</td>
+            <td>1 bit</td>
+            <td>Seriale, protocolli semplici</td>
+        </tr>
+        <tr>
+            <td>CRC-32</td>
+            <td>Burst fino a 32 bit</td>
+            <td>No</td>
+            <td>4 byte</td>
+            <td>Ethernet (FCS)</td>
+        </tr>
+        <tr>
+            <td>Hamming (7,4)</td>
+            <td>2 bit</td>
+            <td>1 bit</td>
+            <td>3 bit su 4</td>
+            <td>RAM ECC, trasmissioni spaziali</td>
+        </tr>
+    </table>
+
+    <hr>
+
+    <!-- QUIZ -->
+    <div class="tool-container" id="quiz">
+        <div class="tool-header">
+            <h3>📝 Esercizi — Livello Data Link</h3>
+            <div class="score-board">
+                <span class="score-display">⭐ <span id="score">0</span> / <span id="total-q">0</span></span>
+                <span class="attempt-display">🔄 <span id="attempts">0</span></span>
+                <button class="btn btn-secondary" onclick="restartQuiz()">Ricomincia</button>
+            </div>
+        </div>
+
+        <div id="quiz-area">
+            <div class="exercise-box" id="question-box">
+                <div class="question-text" id="question-text">Premi "Prossima domanda" per iniziare.</div>
+                <div class="quiz-options" id="quiz-options"></div>
+                <div class="feedback" id="feedback"></div>
+            </div>
+            <div style="text-align:center">
+                <button class="btn" id="btn-next" onclick="nextQuestion()">▶ Prossima domanda</button>
+            </div>
+        </div>
+
+        <div class="result-box" id="result-box" style="display:none"></div>
+    </div>
+
+</div><!-- /container -->
+
+<script>
+// ============================================================
+// SIMULATORE FRAME
+// ============================================================
+const FRAME_FIELDS = [
+    {
+        id: 'fc-preamble', cls: 'fc-preamble',
+        name: 'Preambolo', size: '7 B',
+        valFn: () => 'AA AA AA AA AA AA AA',
+        title: 'Preambolo (7 byte)',
+        desc: 'Sequenza di bit alternati (10101010) ripetuta 7 volte. Serve alla scheda di rete ricevente per <strong>sincronizzarsi</strong> con la frequenza di clock del trasmettitore prima che arrivi il dato vero e proprio. Non è parte del "frame" logico e viene rimosso dall\'hardware.'
+    },
+    {
+        id: 'fc-sfd', cls: 'fc-sfd',
+        name: 'SFD', size: '1 B',
+        valFn: () => 'AB',
+        title: 'SFD — Start Frame Delimiter (1 byte)',
+        desc: 'Valore fisso <code>10101011</code> (0xAB). Il cambio del bit finale (da 0 a 1 rispetto al preambolo) segnala l\'inizio del frame vero e proprio. La scheda di rete usa questo byte per identificare dove inizia l\'intestazione Ethernet.'
+    },
+    {
+        id: 'fc-dst', cls: 'fc-dst-mac',
+        name: 'MAC Dest.', size: '6 B',
+        valFn: () => document.getElementById('in-dst').value.toUpperCase() || '??:??:??:??:??:??',
+        title: 'MAC Destinazione (6 byte)',
+        desc: 'Indirizzo MAC del nodo destinatario. Lo switch legge questo campo per decidere su quale porta uscirà il frame. <br><br>Se il valore è <code>FF:FF:FF:FF:FF:FF</code> il frame è <strong>broadcast</strong> e viene consegnato a tutti i nodi del segmento. I valori come <code>01:00:5E:xx:xx:xx</code> indicano multicast IPv4.'
+    },
+    {
+        id: 'fc-src', cls: 'fc-src-mac',
+        name: 'MAC Sorg.', size: '6 B',
+        valFn: () => document.getElementById('in-src').value.toUpperCase() || '??:??:??:??:??:??',
+        title: 'MAC Sorgente (6 byte)',
+        desc: 'Indirizzo MAC del mittente (la scheda di rete che trasmette). Lo switch lo usa per <strong>aggiornare la propria tabella CAM</strong> (MAC address table): associa il MAC sorgente alla porta da cui è arrivato il frame, così sa dove consegnare i frame futuri diretti a quel nodo.'
+    },
+    {
+        id: 'fc-etype', cls: 'fc-etype',
+        name: 'EtherType', size: '2 B',
+        valFn: () => document.getElementById('in-etype').value.toUpperCase() || '0800',
+        title: 'EtherType / Lunghezza (2 byte)',
+        desc: 'Se il valore è <strong>≥ 0x0600 (1536)</strong>: indica il protocollo di livello 3 incapsulato.<br><br>' +
+              '<strong>Valori comuni:</strong><br>' +
+              '• <code>0x0800</code> = IPv4<br>' +
+              '• <code>0x0806</code> = ARP<br>' +
+              '• <code>0x86DD</code> = IPv6<br>' +
+              '• <code>0x8100</code> = VLAN tag (802.1Q)<br><br>' +
+              'Se il valore è <strong>&lt; 0x0600</strong>: formato 802.3, il campo indica la <em>lunghezza</em> del payload in byte.'
+    },
+    {
+        id: 'fc-payload', cls: 'fc-payload',
+        name: 'Payload', size: '46–1500 B',
+        valFn: () => {
+            const v = document.getElementById('in-payload').value;
+            return v.length > 20 ? v.slice(0,20)+'…' : v;
+        },
+        title: 'Payload / Dati (46–1500 byte)',
+        desc: 'Il pacchetto del livello superiore (tipicamente IP) incapsulato nel frame. <br><br>' +
+              '<strong>Minimo 46 byte:</strong> se il dato è più corto, viene aggiunto del <em>padding</em> (byte a zero) per raggiungere la dimensione minima, necessaria per il funzionamento di CSMA/CD.<br>' +
+              '<strong>Massimo 1500 byte:</strong> è l\'MTU (Maximum Transmission Unit) di Ethernet. Pacchetti IP più grandi vengono frammentati a livello 3 prima dell\'incapsulamento.'
+    },
+    {
+        id: 'fc-fcs', cls: 'fc-fcs',
+        name: 'FCS', size: '4 B',
+        valFn: () => fakeCRC32(document.getElementById('in-payload').value),
+        title: 'FCS — Frame Check Sequence (4 byte)',
+        desc: 'Checksum CRC-32 calcolato dal mittente su tutti i campi del frame (dalla MAC destinazione al payload). <br><br>' +
+              'Il ricevitore ricalcola il CRC: se il valore è diverso dal FCS ricevuto, il frame è <strong>corrotto e viene scartato silenziosamente</strong>. Il recupero degli errori è compito dei protocolli di livello superiore (es. TCP con le ritrasmissioni).'
+    }
+];
+
+function fakeCRC32(s) {
+    let h = 0xDEADBEEF;
+    for (let i = 0; i < s.length; i++) {
+        h = Math.imul(h ^ s.charCodeAt(i), 0x9e3779b9);
+        h ^= h >>> 16;
+    }
+    return (h >>> 0).toString(16).toUpperCase().padStart(8,'0').match(/../g).join(' ');
+}
+
+function validateMAC(mac) {
+    return /^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$/.test(mac);
+}
+
+function buildFrame() {
+    const dst = document.getElementById('in-dst').value.trim();
+    const src = document.getElementById('in-src').value.trim();
+    const err = document.getElementById('frame-error');
+
+    if (!validateMAC(dst) || !validateMAC(src)) {
+        err.textContent = 'Formato MAC non valido. Usa il formato AA:BB:CC:DD:EE:FF';
+        err.style.display = 'block';
+        document.getElementById('frame-visual').style.display = 'none';
+        return;
+    }
+    err.style.display = 'none';
+
+    const row = document.getElementById('frame-row');
+    row.innerHTML = '';
+
+    FRAME_FIELDS.forEach((f, idx) => {
+        const cell = document.createElement('div');
+        cell.className = 'frame-cell ' + f.cls;
+        cell.innerHTML = `<span class="field-name">${f.name}</span><span class="field-val">${f.valFn()}</span><span class="field-size">${f.size}</span>`;
+        cell.onclick = () => showFieldInfo(f, cell);
+        row.appendChild(cell);
+    });
+
+    document.getElementById('frame-visual').style.display = 'block';
+    document.getElementById('fi-title').textContent = 'Seleziona un campo';
+    document.getElementById('fi-desc').innerHTML = 'Clicca su un campo della trama per vedere la descrizione dettagliata.';
+}
+
+function showFieldInfo(f, el) {
+    document.querySelectorAll('.frame-cell').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('fi-title').textContent = f.title;
+    document.getElementById('fi-desc').innerHTML = f.desc;
+}
+
+function resetFrame() {
+    document.getElementById('in-dst').value = 'FF:FF:FF:FF:FF:FF';
+    document.getElementById('in-src').value = '00:1A:2B:3C:4D:5E';
+    document.getElementById('in-etype').value = '0800';
+    document.getElementById('in-payload').value = 'Ciao rete!';
+    document.getElementById('frame-visual').style.display = 'none';
+    document.getElementById('frame-error').style.display = 'none';
+}
+
+// ============================================================
+// TOPOLOGIE
+// ============================================================
+const TOPOS = [
+    {
+        name: 'Bus', icon: busSVG,
+        pro: 'Semplice e poco costoso da cablare.',
+        con: 'Collisioni frequenti; guasto al cavo principale blocca tutta la rete.',
+        use: 'Reti storiche Ethernet 10BASE2 (coassiale); obsoleto nelle LAN moderne.',
+        color: '#fed9a6'
+    },
+    {
+        name: 'Stella', icon: starSVG,
+        pro: 'Facile da gestire; guasto a un nodo non influisce sugli altri.',
+        con: 'Single point of failure: se cade lo switch centrale, cade tutta la rete.',
+        use: 'LAN moderne con switch al centro. La topologia più diffusa oggi.',
+        color: '#cfe2f3'
+    },
+    {
+        name: 'Anello', icon: ringSVG,
+        pro: 'Prestazioni prevedibili; nessuna collisione (token passing).',
+        con: 'Guasto a un nodo può bloccare l\'anello; difficile da espandere.',
+        use: 'Token Ring (IBM, obsoleto); SONET/SDH nelle dorsali WAN (anello ridondato).',
+        color: '#d9ead3'
+    },
+    {
+        name: 'Maglia (Mesh)', icon: meshSVG,
+        pro: 'Alta ridondanza; molti percorsi alternativi.',
+        con: 'Costo e complessità elevati (N×(N-1)/2 collegamenti in mesh completa).',
+        use: 'Core di Internet, reti WAN critiche, wireless mesh.',
+        color: '#ead1dc'
+    },
+    {
+        name: 'Albero', icon: treeSVG,
+        pro: 'Scalabile; estende la topologia a stella in modo gerarchico.',
+        con: 'Dipendente dai nodi intermedi; guasto a un ramo isola il sottoalbero.',
+        use: 'Reti aziendali strutturate (core → distribution → access layer).',
+        color: '#d5fdf4'
+    },
+    {
+        name: 'Ibrida', icon: hybridSVG,
+        pro: 'Combina i vantaggi delle topologie componenti.',
+        con: 'Complessità di gestione variabile.',
+        use: 'Reti reali di grandi organizzazioni: combinazione stella + albero + mesh.',
+        color: '#ffffcc'
+    }
+];
+
+function busSVG() {
+    return `<svg width="80" height="50" viewBox="0 0 80 50">
+        <line x1="10" y1="25" x2="70" y2="25" stroke="#555" stroke-width="3"/>
+        ${[15,30,45,60].map(x=>`<line x1="${x}" y1="25" x2="${x}" y2="12" stroke="#555" stroke-width="2"/><circle cx="${x}" cy="8" r="5" fill="#0645ad"/>`).join('')}
+    </svg>`;
+}
+function starSVG() {
+    return `<svg width="80" height="50" viewBox="0 0 80 50">
+        <circle cx="40" cy="25" r="8" fill="#0645ad"/>
+        ${[[10,10],[70,10],[10,40],[70,40],[40,5]].map(([x,y])=>`<line x1="40" y1="25" x2="${x}" y2="${y}" stroke="#555" stroke-width="2"/><circle cx="${x}" cy="${y}" r="5" fill="#888"/>`).join('')}
+    </svg>`;
+}
+function ringSVG() {
+    return `<svg width="80" height="50" viewBox="0 0 80 50">
+        <circle cx="40" cy="25" r="18" fill="none" stroke="#555" stroke-width="2"/>
+        ${[0,72,144,216,288].map(a=>{const r=18,cx=40+r*Math.cos(a*Math.PI/180),cy=25+r*Math.sin(a*Math.PI/180);return `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="5" fill="#0645ad"/>`;}).join('')}
+    </svg>`;
+}
+function meshSVG() {
+    const pts=[[15,10],[65,10],[10,40],[70,40],[40,25]];
+    let lines='';
+    for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++)
+        lines+=`<line x1="${pts[i][0]}" y1="${pts[i][1]}" x2="${pts[j][0]}" y2="${pts[j][1]}" stroke="#aaa" stroke-width="1.5"/>`;
+    return `<svg width="80" height="50" viewBox="0 0 80 50">${lines}${pts.map(([x,y])=>`<circle cx="${x}" cy="${y}" r="5" fill="#0645ad"/>`).join('')}</svg>`;
+}
+function treeSVG() {
+    return `<svg width="80" height="50" viewBox="0 0 80 50">
+        <circle cx="40" cy="6" r="5" fill="#0645ad"/>
+        <line x1="40" y1="11" x2="20" y2="25" stroke="#555" stroke-width="2"/>
+        <line x1="40" y1="11" x2="60" y2="25" stroke="#555" stroke-width="2"/>
+        <circle cx="20" cy="25" r="5" fill="#0645ad"/>
+        <circle cx="60" cy="25" r="5" fill="#0645ad"/>
+        <line x1="20" y1="30" x2="10" y2="42" stroke="#555" stroke-width="2"/>
+        <line x1="20" y1="30" x2="30" y2="42" stroke="#555" stroke-width="2"/>
+        <line x1="60" y1="30" x2="50" y2="42" stroke="#555" stroke-width="2"/>
+        <line x1="60" y1="30" x2="70" y2="42" stroke="#555" stroke-width="2"/>
+        ${[10,30,50,70].map(x=>`<circle cx="${x}" cy="42" r="4" fill="#888"/>`).join('')}
+    </svg>`;
+}
+function hybridSVG() {
+    return `<svg width="80" height="50" viewBox="0 0 80 50">
+        <circle cx="40" cy="25" r="8" fill="#0645ad"/>
+        <line x1="40" y1="25" x2="15" y2="15" stroke="#555" stroke-width="2"/>
+        <line x1="40" y1="25" x2="65" y2="15" stroke="#555" stroke-width="2"/>
+        <line x1="40" y1="25" x2="40" y2="44" stroke="#555" stroke-width="2"/>
+        <circle cx="15" cy="15" r="5" fill="#0645ad"/>
+        <circle cx="65" cy="15" r="5" fill="#0645ad"/>
+        <line x1="15" y1="15" x2="65" y2="15" stroke="#aaa" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <line x1="8" y1="28" x2="22" y2="28" stroke="#555" stroke-width="2"/>
+        ${[8,22].map(x=>`<circle cx="${x}" cy="28" r="4" fill="#888"/>`).join('')}
+        <circle cx="40" cy="44" r="4" fill="#888"/>
+    </svg>`;
+}
+
+function initTopos() {
+    const grid = document.getElementById('topo-grid');
+    TOPOS.forEach((t, i) => {
+        const card = document.createElement('div');
+        card.className = 'topology-card';
+        card.innerHTML = t.icon() + `<div class="tname">${t.name}</div>`;
+        card.style.borderTopColor = t.color;
+        card.onclick = () => showTopo(t, card);
+        grid.appendChild(card);
+    });
+}
+
+function showTopo(t, el) {
+    document.querySelectorAll('.topology-card').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('td-title').textContent = 'Topologia ' + t.name;
+    document.getElementById('td-body').innerHTML = `
+        <p>✅ <strong>Vantaggi:</strong> ${t.pro}</p>
+        <p>❌ <strong>Svantaggi:</strong> ${t.con}</p>
+        <p>🏭 <strong>Uso tipico:</strong> ${t.use}</p>
+    `;
+    document.getElementById('topo-detail').style.display = 'block';
+}
+
+initTopos();
+
+// ============================================================
+// QUIZ
+// ============================================================
+const ALL_QUESTIONS = [
+    {
+        q: 'Qual è l\'indirizzo MAC di broadcast in una rete Ethernet?',
+        opts: ['00:00:00:00:00:00', 'FF:FF:FF:FF:FF:FF', '01:00:5E:00:00:01', '127.0.0.1'],
+        ans: 1,
+        exp: 'FF:FF:FF:FF:FF:FF (tutti i bit a 1) è il MAC di broadcast: il frame viene consegnato a tutti i nodi del segmento di rete.'
+    },
+    {
+        q: 'Quanti byte occupa il campo FCS in un frame Ethernet II?',
+        opts: ['1 byte', '2 byte', '4 byte', '7 byte'],
+        ans: 2,
+        exp: 'Il FCS (Frame Check Sequence) è un CRC-32, quindi occupa 4 byte. Viene usato per rilevare errori di trasmissione.'
+    },
+    {
+        q: 'Il valore EtherType 0x0806 indica quale protocollo di livello superiore?',
+        opts: ['IPv4', 'IPv6', 'ARP', 'VLAN (802.1Q)'],
+        ans: 2,
+        exp: '0x0806 = ARP (Address Resolution Protocol). 0x0800 = IPv4, 0x86DD = IPv6, 0x8100 = VLAN tag.'
+    },
+    {
+        q: 'In quale sottostrato del Data Link risiede il controllo dell\'accesso al mezzo fisico condiviso?',
+        opts: ['LLC (Logical Link Control)', 'MAC (Medium Access Control)', 'PHY (Physical Layer)', 'IP layer'],
+        ans: 1,
+        exp: 'Il sottostrato MAC si occupa dell\'accesso al mezzo (CSMA/CD, CSMA/CA) e dell\'indirizzamento fisico con gli indirizzi MAC.'
+    },
+    {
+        q: 'Qual è la dimensione minima del payload in un frame Ethernet II?',
+        opts: ['1 byte', '28 byte', '46 byte', '64 byte'],
+        ans: 2,
+        exp: '46 byte è il minimo per il payload. Se i dati sono meno di 46 byte viene aggiunto del padding (byte a zero), necessario per il corretto funzionamento di CSMA/CD (collision detection).'
+    },
+    {
+        q: 'Quale tecnica permette non solo di RILEVARE ma anche di CORREGGERE errori su singolo bit?',
+        opts: ['CRC-32', 'Parità semplice', 'Codice di Hamming', 'FCS Ethernet'],
+        ans: 2,
+        exp: 'Il codice di Hamming aggiunge bit di ridondanza in posizioni calcolate che permettono di localizzare e correggere l\'errore. CRC e parità semplice rilevano gli errori ma non li correggono.'
+    },
+    {
+        q: 'Quale topologia presenta un "single point of failure" nel nodo centrale?',
+        opts: ['Bus', 'Maglia completa', 'Stella', 'Anello'],
+        ans: 2,
+        exp: 'Nella topologia a stella, se lo switch/hub centrale si guasta, tutti i nodi perdono la connettività. È il classico single point of failure (SPOF).'
+    },
+    {
+        q: 'Cosa accade a un frame Ethernet con FCS non corrispondente?',
+        opts: [
+            'Viene ritrasmesso automaticamente dal livello 2',
+            'Viene scartato silenziosamente dalla scheda di rete',
+            'Genera un pacchetto ICMP di errore',
+            'Viene consegnato al livello superiore con un flag di errore'
+        ],
+        ans: 1,
+        exp: 'Il livello Data Link (Ethernet) non gestisce la ritrasmissione: se il CRC non corrisponde, il frame viene silenziosamente scartato. L\'eventuale recupero è responsabilità di livelli superiori come TCP.'
+    },
+    {
+        q: 'Quali sono i primi 3 byte dell\'indirizzo MAC?',
+        opts: [
+            'NIC ID, assegnato dal produttore',
+            'OUI (Organizationally Unique Identifier), identifica il produttore',
+            'Indirizzo di rete, assegnato dall\'IANA',
+            'Prefisso di subnet, configurato dall\'amministratore'
+        ],
+        ans: 1,
+        exp: 'I primi 3 byte (24 bit) sono l\'OUI (Organizationally Unique Identifier), assegnato dall\'IEEE al produttore della scheda. I restanti 3 byte sono il numero seriale assegnato dal produttore stesso.'
+    },
+    {
+        q: 'Qual è la dimensione massima del payload (MTU) in un frame Ethernet standard?',
+        opts: ['512 byte', '1024 byte', '1500 byte', '9000 byte'],
+        ans: 2,
+        exp: 'L\'MTU (Maximum Transmission Unit) di Ethernet è 1500 byte. I Jumbo Frame estendono questo limite fino a 9000 byte, ma richiedono supporto esplicito da parte di tutti i dispositivi della rete.'
+    }
+];
+
+let qPool = [], current = null, score = 0, answered = 0, total = 0;
+
+function shuffle(arr) {
+    for(let i=arr.length-1; i>0; i--) {
+        const j = Math.floor(Math.random()*(i+1));
+        [arr[i],arr[j]] = [arr[j],arr[i]];
+    }
+    return arr;
+}
+
+function restartQuiz() {
+    qPool = shuffle([...ALL_QUESTIONS]);
+    score = 0; answered = 0; total = qPool.length;
+    document.getElementById('score').textContent = 0;
+    document.getElementById('total-q').textContent = total;
+    document.getElementById('attempts').textContent = 0;
+    document.getElementById('quiz-area').style.display = 'block';
+    document.getElementById('result-box').style.display = 'none';
+    document.getElementById('question-text').textContent = 'Premi "Prossima domanda" per iniziare.';
+    document.getElementById('quiz-options').innerHTML = '';
+    document.getElementById('feedback').className = 'feedback';
+    document.getElementById('btn-next').style.display = 'inline-block';
+    current = null;
+}
+
+function nextQuestion() {
+    if (qPool.length === 0) { showResult(); return; }
+    current = qPool.pop();
+    const fb = document.getElementById('feedback');
+    fb.className = 'feedback';
+    fb.textContent = '';
+
+    document.getElementById('question-text').textContent = current.q;
+
+    // shuffle opzioni mantenendo traccia della risposta corretta
+    const indices = shuffle([0,1,2,3]);
+    const correctShuffled = indices.indexOf(current.ans);
+
+    const optsEl = document.getElementById('quiz-options');
+    optsEl.innerHTML = '';
+    indices.forEach((origIdx, newIdx) => {
+        const btn = document.createElement('div');
+        btn.className = 'quiz-option';
+        btn.textContent = current.opts[origIdx];
+        btn.onclick = () => handleAnswer(newIdx, correctShuffled, btn);
+        optsEl.appendChild(btn);
+    });
+
+    document.getElementById('btn-next').style.display = 'none';
+}
+
+function handleAnswer(chosen, correct, el) {
+    const opts = document.querySelectorAll('.quiz-option');
+    opts.forEach(o => o.classList.add('disabled'));
+
+    const fb = document.getElementById('feedback');
+    answered++;
+    document.getElementById('attempts').textContent = answered;
+
+    if (chosen === correct) {
+        el.classList.add('correct');
+        score++;
+        document.getElementById('score').textContent = score;
+        fb.className = 'feedback ok';
+        fb.innerHTML = '✅ Corretto! ' + current.exp;
+    } else {
+        el.classList.add('wrong');
+        opts[correct].classList.add('correct');
+        fb.className = 'feedback ko';
+        fb.innerHTML = '❌ Risposta errata. ' + current.exp;
+    }
+
+    document.getElementById('btn-next').textContent = qPool.length === 0 ? '📊 Vedi risultato' : '▶ Prossima domanda';
+    document.getElementById('btn-next').style.display = 'inline-block';
+}
+
+function showResult() {
+    document.getElementById('quiz-area').style.display = 'none';
+    const rb = document.getElementById('result-box');
+    const pct = Math.round(score/total*100);
+    let emoji = pct >= 80 ? '🏆' : pct >= 60 ? '👍' : '📚';
+    let msg = pct >= 80 ? 'Ottimo lavoro!' : pct >= 60 ? 'Buon risultato, ripassare gli errori.' : 'Rileggi il modulo e riprova.';
+    rb.innerHTML = `<p style="font-size:2em">${emoji}</p>
+        <p><strong>${score} / ${total}</strong> (${pct}%)</p>
+        <p>${msg}</p>
+        <button class="btn" onclick="restartQuiz()">🔄 Riprova</button>`;
+    rb.style.display = 'block';
+}
+
+// init
+restartQuiz();
+// mostra subito il btn senza domanda attiva
+document.getElementById('btn-next').style.display = 'inline-block';
+</script>
+
+</body>
+</html>
