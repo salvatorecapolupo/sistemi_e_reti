@@ -367,37 +367,35 @@
                     <option value="B">Classe B</option>
                     <option value="C">Classe C</option>
                 </select>
-                <span class="edu-hint">Guarda il primo ottetto dell'IP:&#10;1–126 → A &nbsp; 128–191 → B &nbsp; 192–223 → C</span>
+                <span class="edu-hint">Guarda il primo ottetto ...</span>
             </div>
 
             <div class="form-group">
                 <label for="in-mask">2. Subnet Mask</label>
-                <input type="text" id="in-mask" placeholder="es. 255.255.255.224">
-                <span class="edu-hint">Scrivi /N bit a 1 seguiti da (32−N) bit a 0, poi converti ogni ottetto in decimale.&#10;Valori possibili per ottetto: 0, 128, 192, 224, 240, 248, 252, 254, 255</span>
+                <input type="text" id="in-mask" placeholder="es. a.b.c.d">
             </div>
 
             <div class="form-group">
                 <label for="in-net">3. Primo Indirizzo di Rete</label>
-                <input type="text" id="in-net" placeholder="es. 192.168.1.32">
-                <span class="edu-hint">Applica l'AND bit a bit tra l'IP e la Subnet Mask.&#10;Tutti i bit dell'HostID diventano 0.</span>
+                <input type="text" id="in-net" placeholder="es. a.b.c.d">
+                <span class="edu-hint">Applica l'AND bit a bit tra l'IP e la Subnet Mask.&#10;.</span>
             </div>
 
             <div class="form-group">
                 <label for="in-first">4. Primo IP Assegnabile</label>
-                <input type="text" id="in-first" placeholder="es. 192.168.1.33">
-                <span class="edu-hint">È l'indirizzo di rete + 1.&#10; Ad esempio: solo il quarto ottetto cambia, se l'HostID è nell'ultimo ottetto.</span>
+                <input type="text" id="in-first" placeholder="es. a.b.c.d">
+                <span class="edu-hint">È l'indirizzo della prima rete + 1.&#10;.</span>
             </div>
 
             <div class="form-group">
                 <label for="in-last">5. Ultimo IP assegnabile</label>
-                <input type="text" id="in-last" placeholder="es. 192.168.1.62">
-                <span class="edu-hint">È il broadcast − 1.&#10;Tutti i bit host a 1, poi sottrai 1 al risultato.</span>
+                <input type="text" id="in-last" placeholder="es. a.b.c.d">
+                <span class="edu-hint">È l'indirizzo broadcast − 1.&#10;</span>
             </div>
 
             <div class="form-group">
                 <label for="in-bcast">6. Indirizzo di broadcast</label>
-                <input type="text" id="in-bcast" placeholder="es. 192.168.1.63">
-                <span class="edu-hint">Prendi l'indirizzo di rete e porta tutti i bit dell'HostID a 1.&#10;</span>
+                <input type="text" id="in-bcast" placeholder="es. a.b.c.d">
             </div>
 
             <div class="form-group">
