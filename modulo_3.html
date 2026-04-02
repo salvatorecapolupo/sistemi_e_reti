@@ -655,7 +655,17 @@
         const netL   = ip2long(ex.network);
 
         const maxShow   = 16;
-        const totalNets = Math.round(Math.pow(2, 32) / size);
+        // const totalNets = Math.round(Math.pow(2, 32) / size);
+        // fix 2 aprile 2026
+        let bitClasse = 24; // Default per Classe C
+        if (primoOttetto < 128) {
+            bitClasse = 8;  // Classe A
+        } else if (primoOttetto < 192) {
+            bitClasse = 16; // Classe B
+        }
+        
+        // Calcolo corretto del numero di sottoreti nel blocco
+        const totalNets = Math.pow(2, cidr - bitClasse);
         const showCount = Math.min(maxShow, totalNets);
 
         let txt = `La rete ${ex.ip}/${cidr} (maschera ${ex.mask}) è suddivisa in sottoreti `;
