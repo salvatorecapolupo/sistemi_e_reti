@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modulo 6: VLAN e Segmentazione - Wiki Sistemi e Reti</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0891b2;
+            --secondary: #64748b;
+            --bg: #f8fafc;
+            --text: #1e293b;
+            --card-bg: #ffffff;
+            --vlan-10: #ef4444;
+            --vlan-20: #3b82f6;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background-color: var(--bg);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+
+        nav {
+            background: #fff;
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        h2 { color: var(--primary); border-bottom: 2px solid #ecfeff; padding-bottom: 0.5rem; }
+
+        .tag {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        /* Simulator Styles */
+        #vlan-simulator {
+            background: #1e293b;
+            color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .switch-visual {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .port {
+            background: #475569;
+            padding: 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: 0.3s;
+        }
+
+        .port.vlan-10 { border-color: var(--vlan-10); background: #450a0a; }
+        .port.vlan-20 { border-color: var(--vlan-20); background: #172554; }
+
+        .packet {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="index.html">← Torna all'Indice</a>
+</nav>
+
+<header>
+    <h1>Modulo 6: VLAN</h1>
+    <p>Segmentazione logica e Protocollo IEEE 802.1Q</p>
+</header>
+
+<main>
+    <section class="card">
+        <h2>Perché usare le VLAN?</h2>
+        <p>In una rete flat (senza VLAN), tutti i dispositivi appartengono allo stesso <strong>dominio di broadcast</strong>. Le VLAN permettono di:</p>
+        <ul>
+            <li><strong>Ridurre il traffico:</strong> Limitano la propagazione dei messaggi di broadcast (es. ARP).</li>
+            <li><strong>Aumentare la sicurezza:</strong> Isolano reparti sensibili (es. Amministrazione vs Guest).</li>
+            <li><strong>Flessibilità:</strong> Spostare un utente in un'altra rete senza cambiare i cavi fisici.</li>
+        </ul>
+    </section>
+
+    <section class="card">
+        <h2>Tagged vs Untagged Ports</h2>
+        <p>Le porte di uno switch possono essere configurate in due modalità principali:</p>
+        <ul>
+            <li><strong>Access Port (Untagged):</strong> Collega dispositivi finali (PC, stampanti). Il traffico viaggia senza "etichetta" VLAN.</li>
+            <li><strong>Trunk Port (Tagged):</strong> Collega due switch o uno switch e un router. Ogni frame riceve un'etichetta per distinguere a quale VLAN appartiene.</li>
+        </ul>
+    </section>
+
+    <section class="card">
+        <h2>Simulatore di Broadcast Domain</h2>
+        <p>Clicca sulle porte per assegnarle alla <span style="color:var(--vlan-10); font-weight:bold">VLAN 10</span> o alla <span style="color:var(--vlan-20); font-weight:bold">VLAN 20</span>. Poi premi "Invia Broadcast" per vedere come il traffico viene isolato.</p>
+        
+        <div id="vlan-simulator">
+            <div class="switch-visual" id="switch-ports">
+                </div>
+            <div class="controls">
+                <button onclick="sendBroadcast(10)" style="background:var(--vlan-10); border:none; color:white; padding:10px; cursor:pointer; border-radius:4px;">Broadcast VLAN 10</button>
+                <button onclick="sendBroadcast(20)" style="background:var(--vlan-20); border:none; color:white; padding:10px; cursor:pointer; border-radius:4px;">Broadcast VLAN 20</button>
+            </div>
+            <p id="sim-status" style="margin-top:15px; font-style:italic">Configura le porte e avvia...</p>
+        </div>
+    </section>
+
+    <section class="card">
+        <h2>Protocollo IEEE 802.1Q</h2>
+        <p>È lo standard industriale per il <strong>VLAN Tagging</strong>. Aggiunge un campo di 4 byte all'header Ethernet originale.</p>
+        <p>Il campo più importante è il <strong>VID (VLAN Identifier)</strong>:</p>
+        <ul>
+            <li>Dimensioni: **12 bit**.</li>
+            <li>Numero massimo di VLAN: $$2^{12} = 4096$$ (da 0 a 4095).</li>
+            <li>VLAN 1: Generalmente la VLAN nativa di default.</li>
+        </ul>
+    </section>
+
+    <section class="card">
+        <h2>Inter-VLAN Routing</h2>
+        <p>Per far comunicare VLAN diverse (es. VLAN 10 con VLAN 20), è necessario un dispositivo di Livello 3:</p>
+        <ol>
+            <li><strong>Router-on-a-Stick:</strong> Un singolo link fisico (Trunk) verso il router diviso in <em>sub-interfaces</em> logiche.</li>
+            <li><strong>Layer 3 Switch:</strong> Utilizza le <strong>SVI (Switch Virtual Interface)</strong>, interfacce virtuali associate a ogni VLAN che fungono da gateway.</li>
+        </ol>
+    </section>
+</main>
+
+<script>
+    const portContainer = document.getElementById('switch-ports');
+    const statusText = document.getElementById('sim-status');
+    const ports = [10, 10, 20, 20, 10, 20, 10, 20]; // Default assignments
+
+    function renderPorts() {
+        portContainer.innerHTML = '';
+        ports.forEach((vlan, index) => {
+            const div = document.createElement('div');
+            div.className = `port vlan-${vlan}`;
+            div.innerHTML = `Port ${index + 1}<br><small>VLAN ${vlan}</small>`;
+            div.onclick = () => togglePort(index);
+            portContainer.appendChild(div);
+        });
+    }
+
+    function togglePort(index) {
+        ports[index] = ports[index] === 10 ? 20 : 10;
+        renderPorts();
+    }
+
+    function sendBroadcast(vlanId) {
+        statusText.innerText = `Invio traffico broadcast su VLAN ${vlanId}...`;
+        const allPorts = document.querySelectorAll('.port');
+        
+        allPorts.forEach((port, index) => {
+            port.style.transform = "scale(1)";
+            if (ports[index] === vlanId) {
+                setTimeout(() => {
+                    port.style.transform = "scale(1.1)";
+                    port.style.boxShadow = `0 0 15px ${vlanId === 10 ? '#ef4444' : '#3b82f6'}`;
+                }, 100);
+                setTimeout(() => {
+                    port.style.transform = "scale(1)";
+                    port.style.boxShadow = "none";
+                }, 600);
+            }
+        });
+
+        setTimeout(() => {
+            statusText.innerText = `Il broadcast ha raggiunto solo le porte appartenenti alla VLAN ${vlanId}.`;
+        }, 700);
+    }
+
+    renderPorts();
+</script>
+
+</body>
+</html>
