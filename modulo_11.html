@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modulo 11: NAT e PAT - Wiki Sistemi e Reti</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #f59e0b;
+            --secondary: #64748b;
+            --bg: #f8fafc;
+            --text: #1e293b;
+            --card-bg: #ffffff;
+            --accent: #ea580c;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background-color: var(--bg);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+
+        nav {
+            background: #fff;
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        h2 { color: var(--accent); border-bottom: 2px solid #ffedd5; padding-bottom: 0.5rem; }
+
+        code { background: #fee2e2; color: #991b1b; padding: 0.2rem 0.4rem; border-radius: 4px; }
+
+        /* Simulator Styles */
+        #nat-simulator {
+            background: #0f172a;
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .nat-grid {
+            display: grid;
+            grid-template-columns: 1fr 100px 1fr;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .host-box { background: #1e293b; border: 2px solid #3b82f6; padding: 10px; border-radius: 6px; }
+        .router-box { background: #334155; border: 2px solid #f59e0b; padding: 15px; border-radius: 50%; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; }
+        .internet-box { background: #1e293b; border: 2px solid #10b981; padding: 10px; border-radius: 6px; }
+
+        .packet-animation {
+            height: 40px;
+            position: relative;
+            background: #1e293b;
+            border-radius: 20px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .packet {
+            width: 80px;
+            height: 100%;
+            background: #f59e0b;
+            position: absolute;
+            left: -100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: black;
+            transition: all 2s linear;
+        }
+
+        table.nat-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            margin-top: 10px;
+        }
+        table.nat-table th, table.nat-table td { border: 1px solid #475569; padding: 8px; text-align: left; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="index.html">← Torna all'Indice</a>
+</nav>
+
+<header>
+    <h1>Modulo 11: NAT e PAT</h1>
+    <p>Network Address Translation e il salvataggio degli indirizzi IPv4</p>
+</header>
+
+<main>
+    <section class="card">
+        <h2>Cos'è il NAT?</h2>
+        <p>Il NAT è una tecnica che permette di modificare l'indirizzo IP nell'header di un pacchetto mentre attraversa un router. La sua funzione principale è permettere a una rete privata (con IP non instradabili su Internet) di accedere alla rete pubblica usando un unico (o pochi) IP pubblici.</p>
+        <blockquote>
+            <strong>Problema:</strong> Esaurimento indirizzi IPv4.<br>
+            <strong>Soluzione:</strong> Migliaia di host privati "nascosti" dietro un solo IP pubblico.
+        </blockquote>
+    </section>
+
+    <section class="card">
+        <h2>Terminologia Cisco</h2>
+        <ul>
+            <li><strong>Inside Local:</strong> L'indirizzo IP assegnato all'host nella rete interna (es. <code>192.168.1.10</code>).</li>
+            <li><strong>Inside Global:</strong> L'indirizzo pubblico visto dall'esterno (assegnato dall'ISP).</li>
+            <li><strong>Outside Global:</strong> L'indirizzo IP pubblico della destinazione (es. il server di Google).</li>
+        </ul>
+    </section>
+
+    <section class="card">
+        <h2>Simulatore PAT (Port Address Translation)</h2>
+        <p>Invia un pacchetto dal PC interno verso Internet. Osserva come il Router cambia l'IP sorgente e la Porta per permettere il ritorno del traffico.</p>
+        
+        <div id="nat-simulator">
+            <div class="nat-grid">
+                <div class="host-box">
+                    <strong>PC Interno</strong><br>
+                    <small>IP: 192.168.1.50</small>
+                </div>
+                <div class="router-box">ROUTER</div>
+                <div class="internet-box">
+                    <strong>Web Server</strong><br>
+                    <small>IP: 8.8.8.8</small>
+                </div>
+            </div>
+
+            <div class="packet-animation">
+                <div id="packet" class="packet">PACCHETTO</div>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin: 15px 0;">
+                <button onclick="animatePacket()" style="background:#f59e0b; border:none; padding:8px 15px; border-radius:4px; cursor:pointer;">Invia Pacchetto</button>
+                <div id="packet-info" style="font-family: monospace; font-size: 0.85rem;">Header: --</div>
+            </div>
+
+            <strong>NAT Translation Table</strong>
+            <table class="nat-table">
+                <thead>
+                    <tr>
+                        <th>Prototocollo</th>
+                        <th>Inside Local (Privato)</th>
+                        <th>Inside Global (Pubblico)</th>
+                    </tr>
+                </thead>
+                <tbody id="nat-table-body">
+                    <tr><td colspan="3" style="text-align:center">Tabella vuota</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="card">
+        <h2>Tipi di NAT</h2>
+        <h3>1. NAT Statico</h3>
+        <p>Mappatura $1:1$ tra un IP privato e uno pubblico. Usato per i server interni che devono essere raggiungibili dall'esterno.</p>
+        
+        <h3>2. NAT Dinamico</h3>
+        <p>Mappatura molti-a-molti. Il router ha un pool di IP pubblici e li assegna ai client interni finché sono disponibili.</p>
+
+        <h3>3. PAT (NAT Overload)</h3>
+        <p>È la forma più comune. Mappatura $N:1$. Molti IP privati usano lo stesso IP pubblico, distinguendosi tramite il <strong>numero di porta TCP/UDP</strong>.</p>
+    </section>
+
+    <section class="card">
+        <h2>Vantaggi e Svantaggi</h2>
+        <table style="width:100%; border-collapse: collapse;">
+            <tr style="background:#f1f5f9">
+                <th style="padding:10px; border:1px solid #cbd5e1">Vantaggi</th>
+                <th style="padding:10px; border:1px solid #cbd5e1">Svantaggi</th>
+            </tr>
+            <tr>
+                <td style="padding:10px; border:1px solid #cbd5e1">Risparmio indirizzi IPv4</td>
+                <td style="padding:10px; border:1px solid #cbd5e1">Perdita di end-to-end traceability</td>
+            </tr>
+            <tr>
+                <td style="padding:10px; border:1px solid #cbd5e1">Maggiore sicurezza (nasconde la topologia)</td>
+                <td style="padding:10px; border:1px solid #cbd5e1">Ritardo (overhead) dovuto alla traduzione</td>
+            </tr>
+        </table>
+    </section>
+</main>
+
+<script>
+    function animatePacket() {
+        const packet = document.getElementById('packet');
+        const info = document.getElementById('packet-info');
+        const tableBody = document.getElementById('nat-table-body');
+        const publicIP = "93.44.12.190";
+        const randomPort = Math.floor(Math.random() * (65535 - 1024) + 1024);
+
+        // Reset
+        packet.style.transition = 'none';
+        packet.style.left = '-100px';
+        packet.style.background = '#f59e0b';
+        
+        setTimeout(() => {
+            // Step 1: PC -> Router
+            packet.style.transition = 'all 1s linear';
+            packet.style.left = '110px';
+            info.innerHTML = "Sorgente: <span style='color:#3b82f6'>192.168.1.50:5000</span>";
+            
+            // Step 2: Router (Translation) -> Internet
+            setTimeout(() => {
+                packet.style.background = '#ef4444';
+                packet.style.left = '520px';
+                info.innerHTML = `Sorgente tradotta (PAT): <span style='color:#f59e0b'>${publicIP}:${randomPort}</span>`;
+                
+                // Aggiorna tabella
+                tableBody.innerHTML = `
+                    <tr>
+                        <td>TCP</td>
+                        <td>192.168.1.50:5000</td>
+                        <td>${publicIP}:${randomPort}</td>
+                    </tr>
+                `;
+            }, 1100);
+        }, 50);
+    }
+</script>
+
+</body>
+</html>
